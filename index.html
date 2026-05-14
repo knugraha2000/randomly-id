@@ -882,9 +882,14 @@ async function getAI(isSurprise) {
     } else if(data.raw) {
       parsed = JSON.parse(data.raw);
     } else {
-      const raw = data.content?.[0]?.text || '';
-      const clean = raw.replace(/```json|```/g,'').trim();
-      parsed = JSON.parse(clean);
+      let parsed;
+if(data.result) {
+  parsed = data.result;
+} else {
+  const raw = data.content?.[0]?.text || '';
+  const clean = raw.replace(/```json|```/g,'').trim();
+  parsed = JSON.parse(clean);
+}
     }
 
     currentRekom = {
