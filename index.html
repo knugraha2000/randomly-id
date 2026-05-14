@@ -945,7 +945,7 @@ function addActions(body) {
   if (activeTab === 'makan') {
   }
   html += `<button class="btn-lagi" onclick="ke('home')">↩️ Coba kategori lain</button>`;
-  html += `<button class="btn-lagi" onclick="submit(false)">🔄 Gak cocok? Ganti!</button>`;
+  html += `<button class="btn-lagi" onclick="submitGanti()">🔄 Gak cocok? Ganti!</button>`;
   wrap.innerHTML = html;
   body.appendChild(wrap);
 }
@@ -1024,7 +1024,8 @@ function buildPrompt(isSurprise) {
     : 'tidak ada preferensi khusus';
   const rnd = isSurprise ? '\nMode surprise: pilih yang sedikit tidak terduga tapi tetap masuk akal dan bikin senyum.' : '';
   const fmt = '\nBalas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(HURUF KAPITAL maks 4 kata)","alasan":"(1-2 kalimat santai, relatable, sedikit lucu — dalam tanda kutip)","fun_fact":"(1 fun fact menarik dan singkat, maks 2 kalimat)","tags":["tag1","tag2","tag3"]}';
-  const base = `Kamu teman yang santai & sedikit lucu. Hari ${hari}, jam ${jam}.00 WIB. Preferensi user: ${ctx}. WAJIB ikuti semua preferensi dengan ketat — jika pilih Korea rekomendasikan makanan Korea, jika Vegan harus benar-benar vegan, dst.${rnd}`;
+  const seed = Math.floor(Math.random() * 1000); // untuk variasi jawaban
+  const base = `Kamu teman yang santai & sedikit lucu. Hari ${hari}, jam ${jam}.00 WIB. Preferensi user: ${ctx}. WAJIB ikuti semua preferensi dengan ketat — jika pilih Korea rekomendasikan makanan Korea, jika Vegan harus benar-benar vegan, dst. Seed variasi: ${seed} (gunakan ini untuk pastikan rekomendasi berbeda setiap kali).${rnd}`;
 
   const p = {
     makan: `${base}\nRekomendasikan 1 jenis makanan. WAJIB ikuti SEMUA filter: dietary (halal/vegan/vegetarian/dll), jenis masakan (Indonesia/Korea/Jepang/Timur Tengah/dll), waktu makan, rasa, dan situasi. Jika user pilih Korea, rekomendasikan makanan Korea. Jika Vegan, harus benar-benar vegan. JANGAN abaikan filter apapun.${fmt}`,
@@ -1063,6 +1064,15 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── SUBMIT GANTI ──
+function submitGanti() {
+  // Force different by temporarily adding random hint to answers
+  const oldHint = answers._hint;
+  answers._hint = 'coba yang berbeda, jangan ulangi yang sama, variasi ' + Math.random();
+  submit(false);
+  delete answers._hint;
 }
 
 // ── NAV ──
