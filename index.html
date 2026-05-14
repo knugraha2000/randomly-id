@@ -94,25 +94,25 @@ body {
   letter-spacing: 1px; margin-bottom: 8px;
 }
 .cat-tabs {
-  display: flex; gap: 6px;
-  overflow-x: auto; scrollbar-width: none;
-  padding-bottom: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 2px solid var(--ink);
 }
-.cat-tabs::-webkit-scrollbar { display: none; }
 .cat-tab {
   display: flex; flex-direction: column;
-  align-items: center; gap: 3px;
-  padding: 8px 10px; border-radius: var(--radius-sm);
-  border: 2px solid var(--border);
+  align-items: center; gap: 2px;
+  padding: 10px 4px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   background: var(--white); cursor: pointer;
-  transition: all 0.12s; flex-shrink: 0;
+  transition: all 0.12s;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  min-width: 58px;
+  border-top: none; border-left: none;
 }
+.cat-tab:nth-child(4n) { border-right: none; }
+.cat-tab:nth-child(5), .cat-tab:nth-child(6), .cat-tab:nth-child(7), .cat-tab:nth-child(8) { border-bottom: none; }
 .cat-tab:active { transform: scale(0.94); }
-.cat-tab.on {
-  background: var(--ink); border-color: var(--ink);
-}
+.cat-tab.on { background: var(--ink); }
 .cat-tab.on .cat-tab-lbl { color: var(--yellow); }
 .cat-tab-icon { font-size: 20px; }
 .cat-tab-lbl { font-size: 10px; font-weight: 700; color: var(--ink-mid); }
@@ -261,6 +261,14 @@ body {
 .fun-fact { background: rgba(0,0,0,0.06); border-radius: var(--rs); padding: 8px 12px; margin-bottom: 12px; text-align: left; }
 .ff-label { font-size: 9px; font-weight: 700; color: var(--inkm); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
 .ff-txt { font-size: 11px; color: var(--inkm); line-height: 1.5; font-weight: 400; }
+.city-input { width: 100%; padding: 8px 12px; border: 2px solid var(--border); border-radius: var(--rs); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink); background: var(--w); margin-top: 8px; outline: none; }
+.city-input:focus { border-color: var(--ink); }
+.btn-funfact { width: 100%; padding: 12px; background: #FFF8E7; color: #8A6A00; border: 2px solid var(--ink); border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 var(--ink); }
+.btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+.masak-list { background: rgba(0,0,0,0.04); border-radius: var(--rs); padding: 12px 14px; margin-bottom: 12px; text-align: left; }
+.masak-item { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.masak-detail { font-size: 11px; color: var(--inkm); margin-bottom: 10px; font-weight: 400; }
+.masak-item:last-of-type + .masak-detail { margin-bottom: 0; }
 .rtag {
   font-size: 11px; padding: 4px 12px; border-radius: 20px;
   font-weight: 700; border: 1.5px solid var(--ink);
@@ -474,7 +482,7 @@ body {
 </head>
 <body>
 
-<div class="ver">v1.0.0</div>
+<div class="ver">v1.1.0</div>
 <div class="toast" id="toast"></div>
 
 <!-- IG MODAL -->
@@ -524,6 +532,9 @@ body {
       <button class="cat-tab" onclick="pCat(this,'gebetan')" data-cat="gebetan">
         <span class="cat-tab-icon">💖</span><span class="cat-tab-lbl">Cinta</span>
       </button>
+      <button class="cat-tab" onclick="pCat(this,'masak')" data-cat="masak">
+        <span class="cat-tab-icon">🍳</span><span class="cat-tab-lbl">Masak</span>
+      </button>
       <button class="cat-tab" onclick="pCat(this,'jalan')" data-cat="jalan">
         <span class="cat-tab-icon">🚶</span><span class="cat-tab-lbl">Jalan</span>
       </button>
@@ -546,6 +557,7 @@ body {
   <div class="action-wrap">
     <button class="btn-go" onclick="submit(false)">Rekomendasi →</button>
     <button class="btn-random" onclick="submit(true)">🎲 Gabut Mode — acak semua!</button>
+    <button class="btn-funfact" onclick="getFunFact()">💡 Fun Fact Random</button>
   </div>
   <div style="text-align:center;padding:8px 24px 24px;">
     <a href="/privacy.html" style="font-size:11px;color:#9A9A9A;text-decoration:none;font-weight:500;">Privacy Policy</a>
@@ -643,8 +655,9 @@ const qData = {
   ],
 
   jalan: [
-    { key:'kota', txt:'Kota mana? 🏙️',
-      choices:['Jakarta','Bandung','Bali','Jogja','Surabaya','Kota lain'] },
+    { key:'kota', txt:'Kamu lagi di kota mana? 🏙️',
+      choices:['Jakarta','Bandung','Bali','Jogja','Surabaya','📍 Deteksi otomatis','✏️ Kota lain...'],
+      hasInput: true },
     { key:'bareng', txt:'Sama siapa? 👥',
       choices:['🙋 Sendiri','👫 Berdua','👨‍👩‍👧 Keluarga','👥 Rame-rame'] }
   ],
@@ -677,16 +690,22 @@ const qData = {
       choices:['💭 Mau nembak','💔 Mau mutusin','😰 Lagi berantem','🤔 Mau ngungkapin','👻 Lagi di-ghosting'] },
     { key:'durasi', txt:'Udah jalan berapa lama? ⏳',
       choices:['⚡ Baru kenal','🌱 Beberapa bulan','🌳 Lebih setahun','😭 Lama tapi ga jelas'] }
+  ],
+  masak: [
+    { key:'meal', txt:'Berapa hidangan? 🍽️',
+      choices:['🍽️ 1 hidangan','🍽️🍽️ 2 hidangan','🍽️🍽️🍽️ 3 hidangan'] },
+    { key:'occasion', txt:'Masak buat apa? 🎯',
+      choices:['🍱 Masak harian','👨‍👩‍👧 Masak buat mertua','💑 Dinner romantis','🎒 Bekal anak','🎉 Acara spesial'] }
   ]
 };
 
 const catLabels = {
   makan:'REKOMENDASI MAKAN', kado:'REKOMENDASI KADO',
-  gebetan:'KEPUTUSAN CINTA', jalan:'REKOMENDASI JALAN',
+  gebetan:'KEPUTUSAN CINTA', masak:'MASAK APA HARI INI', jalan:'REKOMENDASI JALAN',
   nonton:'REKOMENDASI TONTONAN', baca:'REKOMENDASI BACAAN', nulis:'INSPIRASI NULIS'
 };
 
-const cats = ['makan','kado','gebetan','jalan','nonton','baca','nulis'];
+const cats = ['makan','kado','gebetan','masak','jalan','nonton','baca','nulis'];
 
 // ── GREETING ──
 function setGreeting() {
@@ -734,23 +753,53 @@ function renderQ(tab) {
     const autoVal = (q.auto && tab === 'makan') ? getAutoWaktu() : null;
     if (autoVal) answers[q.key] = autoVal;
 
-    q.choices.forEach(c => {
+    // City input for jalan
+    var cityInput = null;
+    if(q.hasInput) {
+      cityInput = document.createElement('input');
+      cityInput.type = 'text';
+      cityInput.className = 'city-input';
+      cityInput.placeholder = 'Ketik nama kota...';
+      cityInput.style.display = 'none';
+      cityInput.addEventListener('input', function() {
+        if(cityInput.value.trim()) answers[q.key] = cityInput.value.trim();
+      });
+    }
+
+    q.choices.forEach(choice => {
       const btn = document.createElement('button');
-      btn.className = 'chip' + (c === autoVal ? ' on' : '');
-      btn.textContent = c;
+      btn.className = 'chip' + (choice === autoVal ? ' on' : '');
+      btn.textContent = choice;
       btn.onclick = () => {
-        // Toggle: tap yang sudah on = off
+        if(choice === '✏️ Kota lain...') {
+          chips.querySelectorAll('.chip').forEach(b => b.classList.remove('on'));
+          btn.classList.add('on');
+          if(cityInput) { cityInput.style.display = 'block'; cityInput.focus(); }
+          delete answers[q.key];
+          return;
+        }
+        if(choice === '📍 Deteksi otomatis') {
+          chips.querySelectorAll('.chip').forEach(b => b.classList.remove('on'));
+          btn.classList.add('on');
+          if(cityInput) cityInput.style.display = 'none';
+          answers[q.key] = 'lokasi saat ini';
+          return;
+        }
         if(btn.classList.contains('on')){
-          btn.classList.remove('on'); delete answers[q.key]; checkReady(); return;
+          btn.classList.remove('on'); delete answers[q.key];
+          if(cityInput) cityInput.style.display = 'none';
+          checkReady(); return;
         }
         chips.querySelectorAll('.chip').forEach(b => b.classList.remove('on'));
         btn.classList.add('on');
-        answers[q.key] = c;
+        answers[q.key] = choice;
+        if(cityInput) cityInput.style.display = 'none';
         checkReady();
       };
       chips.appendChild(btn);
     });
     block.appendChild(chips);
+    if(cityInput) block.appendChild(cityInput);
 
     // Detail link
     if (qi === qs.length - 1) {
@@ -895,13 +944,19 @@ async function getAI(isSurprise) {
       nama: parsed.nama || '—',
       alasan: parsed.alasan || '',
       fun_fact: parsed.fun_fact || '',
+      masak_list: parsed.masak_list || '',
       tags: parsed.tags || []
     };
     // Simpan ke history, max 3
     rekomenHistory.push(parsed.nama || '');
     if(rekomenHistory.length > 3) rekomenHistory.shift();
 
-    renderResult(body);
+    if(activeTab === 'masak') {
+      renderMasakResult(body, parsed);
+      addActions(body);
+    } else {
+      renderResult(body);
+    }
 
   } catch(e) {
     clearInterval(lt);
@@ -1042,7 +1097,8 @@ function buildPrompt(isSurprise) {
     nonton: `${base}\nRekomendasikan 1 film atau series SPESIFIK (sebutkan judul nyata yang ada). WAJIB sesuai SEMUA filter: tipe (film/series/stand-up), genre, durasi, dan mood nonton.${fmt}`,
     kado: `${base}\nRekomendasikan 1 ide kado yang SPESIFIK dan kreatif. WAJIB sesuai SEMUA filter: untuk siapa, occasion, budget, usia penerima, dan sifat orangnya.${fmt}`,
     nulis: `${base}\nBantu atasi writer's block dengan 1 ide tulisan yang konkret dan segar. WAJIB sesuai SEMUA filter: jenis tulisan, bagian yang stuck, platform tujuan, tone, dan panjang tulisan.${fmt}`,
-    gebetan: `${base}\nKamu sahabat jujur yang sedikit lucu. Berikan 1 keputusan tegas soal situasi cinta ini. Pilih nama: TEMBAK SEKARANG / TUNGGU DULU / MOVE ON AJA / BICARAIN BAIK-BAIK / GHOSTING BALIK. Nama huruf kapital, alasan relatable dan sedikit lucu. Jangan plinplan.${fmt}`
+    gebetan: `${base}\nKamu sahabat jujur yang sedikit lucu. Berikan 1 keputusan tegas soal situasi cinta ini. Pilih nama: TEMBAK SEKARANG / TUNGGU DULU / MOVE ON AJA / BICARAIN BAIK-BAIK / GHOSTING BALIK. Nama huruf kapital, alasan relatable dan sedikit lucu. Jangan plinplan.${fmt}`,
+    masak: `${base}\nKamu membantu seseorang memutuskan mau masak apa. Rekomendasikan menu lengkap sesuai jumlah hidangan yang diminta. Format output WAJIB seperti ini (jangan tambah teks lain di luar JSON):\n{"emoji":"🍳","nama":"NAMA MENU UTAMA","alasan":"(1-2 kalimat santai kenapa menu ini cocok)","masak_list":"1. NAMA MASAKAN 1\n   bahan utama · ~waktu\n2. NAMA MASAKAN 2\n   bahan utama · ~waktu","fun_fact":"(fun fact menarik tentang salah satu masakan ini, 3 kalimat, bikin hah beneran?!)","tags":["tag1","tag2","tag3"]}`
   };
   return p[activeTab] || p.makan;
 }
@@ -1072,6 +1128,71 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── FUN FACT ──
+async function getFunFact() {
+  ke('result');
+  const body = document.getElementById('result-body');
+  body.innerHTML = '';
+  document.getElementById('result-hdr-title').textContent = 'FUN FACT RANDOM';
+
+  const card = document.createElement('div');
+  card.className = 'result-card'; card.id = 'result-card';
+  card.innerHTML = '<div class="load-wrap"><div class="load-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="load-txt">Lagi korek-korek fakta unik...</div></div>';
+  body.appendChild(card);
+
+  const topics = ['sains','sejarah Indonesia','psikologi manusia','makanan & kuliner','teknologi','alam & hewan','tubuh manusia','budaya dunia'];
+  const topic = topics[Math.floor(Math.random() * topics.length)];
+  const prompt = `Berikan 1 fun fact yang benar-benar menarik dan mengejutkan tentang topik: ${topic}. Fun fact harus bikin orang bilang "hah beneran?!" Balas HANYA JSON tanpa backtick:
+{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA, HURUF KAPITAL, maks 5 kata)","alasan":"(penjelasan fun fact, 3 kalimat, informatif dan mengejutkan)","fun_fact":"","tags":["${topic}","fakta","unik"]}`;
+
+  try {
+    const res = await fetch('/api/recommend', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({max_tokens:300, messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    const raw = data.content?.[0]?.text||'';
+    let clean=raw.replace(/\`\`\`json|\`\`\`/g,'').trim();
+    const j1=clean.indexOf('{'),j2=clean.lastIndexOf('}');
+    if(j1>-1&&j2>-1) clean=clean.substring(j1,j2+1);
+    const parsed=JSON.parse(clean);
+
+    currentRekom={emoji:parsed.emoji||'💡',nama:parsed.nama||'FUN FACT',alasan:parsed.alasan||'',fun_fact:'',tags:parsed.tags||[]};
+    const tagHtml=(parsed.tags||[]).map(t=>`<span class="rtag">${t}</span>`).join('');
+    card.innerHTML=`<span class="r-emoji">${parsed.emoji||'💡'}</span><div class="r-cat">FUN FACT RANDOM</div><div class="r-nama">${parsed.nama||'FUN FACT'}</div><div class="r-alasan">${parsed.alasan||''}</div><div class="r-tags">${tagHtml}</div>`;
+
+    const shareWrap=document.createElement('div');
+    shareWrap.className='share-wrap';
+    shareWrap.innerHTML=`<div class="share-lbl">Share ke teman 👇</div><div class="share-btns"><button class="share-btn wa" onclick="shareWA()"><span class="share-btn-icon">💬</span><span class="share-btn-lbl">WhatsApp</span></button><button class="share-btn ig" onclick="shareIG()"><span class="share-btn-icon">📸</span><span class="share-btn-lbl">Instagram</span></button><button class="share-btn cp" onclick="copyTeks()"><span class="share-btn-icon">📋</span><span class="share-btn-lbl">Salin</span></button></div>`;
+    body.appendChild(shareWrap);
+
+    const wrap=document.createElement('div');
+    wrap.className='result-actions';
+    wrap.innerHTML='<button class="btn-lagi" onclick="getFunFact()">🔄 Fun Fact lain!</button><button class="btn-lagi" onclick="ke('home')">↩️ Kembali</button>';
+    body.appendChild(wrap);
+
+  } catch(e) {
+    card.innerHTML='<span style="font-size:30px">😅</span><div style="font-size:13px;margin-top:10px">Aduh error nih, coba lagi!</div>';
+  }
+}
+
+// ── MASAK RESULT RENDERING ──
+function renderMasakResult(body, parsed) {
+  const card = document.getElementById('result-card');
+  const masakList = parsed.masak_list || '';
+  const tagHtml = (parsed.tags||[]).map(t=>`<span class="rtag">${t}</span>`).join('');
+  const ffHtml = parsed.fun_fact ? `<div class="fun-fact"><div class="ff-label">💡 Fun Fact</div><div class="ff-txt">${parsed.fun_fact}</div></div>` : '';
+
+  card.innerHTML = `
+    <span class="r-emoji">${parsed.emoji||'🍳'}</span>
+    <div class="r-cat">MASAK APA HARI INI</div>
+    <div class="r-nama">${parsed.nama||'—'}</div>
+    <div class="r-alasan">${parsed.alasan||''}</div>
+    ${masakList ? `<div class="masak-list"><pre style="font-family:inherit;font-size:13px;line-height:1.7;white-space:pre-wrap;color:#4A4A4A">${masakList}</pre></div>` : ''}
+    ${ffHtml}
+    <div class="r-tags">${tagHtml}</div>`;
 }
 
 // ── SUBMIT GANTI ──
@@ -1116,6 +1237,12 @@ const extraQ = {
   gebetan:[
     {key:'mood',txt:'💗 Kondisi hati sekarang?',choices:['😊 Deg-degan & hopeful','😔 Udah mulai cape','😡 Kesel tapi masih sayang','🤷 Bodo amat']},
     {key:'respons',txt:'💬 Dia selama ini gimana?',choices:['😍 Responsif & perhatian','😐 Biasa aja','🥶 Dingin & jarang balas','🤔 Hot & cold']}
+  ],
+  masak:[
+    {key:'untuk',txt:'👥 Untuk berapa orang?',choices:['👤 Sendiri/berdua','👨‍👩‍👧 Keluarga kecil (3-4)','👨‍👩‍👧‍👦 Keluarga besar (5+)']},
+    {key:'level',txt:'👨‍🍳 Level memasak?',choices:['🏠 Rumahan','👨‍🍳 Amatir','⭐ MasterChef']},
+    {key:'bahan',txt:'🛒 Bahan utama?',choices:['🍗 Ayam','🥩 Daging','🦐 Seafood','🥬 Sayur','🥚 Telur']},
+    {key:'waktu',txt:'⏱️ Waktu masak?',choices:['⚡ < 30 menit','🕐 30-60 menit','🕑 Bebas']}
   ],
   jalan:[
     {key:'vibe',txt:'🌟 Vibe yang dicari?',choices:['🌿 Alam & outdoor','🎨 Seni & budaya','🛍️ Shopping','📸 Instagramable','🍻 Kuliner']},
