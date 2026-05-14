@@ -471,7 +471,7 @@ body {
 </head>
 <body>
 
-<div class="ver">v0.9.8</div>
+<div class="ver">v1.0.0</div>
 <div class="toast" id="toast"></div>
 
 <!-- IG MODAL -->
@@ -864,16 +864,11 @@ async function getAI(isSurprise) {
   const prompt = buildPrompt(isSurprise);
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/recommend', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': 'MASUKKAN_API_KEY_DISINI',
-        'anthropic-version': '2023-06-01'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
+        max_tokens: 400,
         messages: [{ role: 'user', content: prompt }]
       })
     });
