@@ -627,6 +627,7 @@ body {
 let activeTab = 'makan';
 let answers = {};
 let currentRekom = {};
+let rekomenHistory = []; // track last 3 rekomendasi
 let reqCount = 0;
 let skipCount = 0;
 let cooldownUntil = 0;
@@ -775,6 +776,7 @@ function pCat(btn, cat) {
   document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   activeTab = cat;
+  rekomenHistory = []; // reset history saat ganti kategori
   renderQ(cat);
 }
 
@@ -895,6 +897,9 @@ async function getAI(isSurprise) {
       fun_fact: parsed.fun_fact || '',
       tags: parsed.tags || []
     };
+    // Simpan ke history, max 3
+    rekomenHistory.push(parsed.nama || '');
+    if(rekomenHistory.length > 3) rekomenHistory.shift();
 
     renderResult(body);
 
@@ -1024,8 +1029,11 @@ function buildPrompt(isSurprise) {
     : 'tidak ada preferensi khusus';
   const rnd = isSurprise ? '\nMode surprise: pilih yang sedikit tidak terduga tapi tetap masuk akal dan bikin senyum.' : '';
   const fmt = '\nBalas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(HURUF KAPITAL maks 4 kata)","alasan":"(1-2 kalimat santai, relatable, sedikit lucu — dalam tanda kutip)","fun_fact":"(1 fun fact menarik dan singkat, maks 2 kalimat)","tags":["tag1","tag2","tag3"]}';
-  const seed = Math.floor(Math.random() * 1000); // untuk variasi jawaban
-  const base = `Kamu teman yang santai & sedikit lucu. Hari ${hari}, jam ${jam}.00 WIB. Preferensi user: ${ctx}. WAJIB ikuti semua preferensi dengan ketat — jika pilih Korea rekomendasikan makanan Korea, jika Vegan harus benar-benar vegan, dst. Seed variasi: ${seed} (gunakan ini untuk pastikan rekomendasi berbeda setiap kali).${rnd}`;
+  const seed = Math.floor(Math.random() * 1000);
+  const historyNote = rekomenHistory.length > 0
+    ? ` JANGAN rekomendasikan yang sudah pernah disarankan: ${rekomenHistory.join(', ')}.`
+    : '';
+  const base = `Kamu teman yang santai & sedikit lucu. Hari ${hari}, jam ${jam}.00 WIB. Preferensi user: ${ctx}. WAJIB ikuti semua preferensi dengan ketat — jika pilih Korea rekomendasikan makanan Korea, jika Vegan harus benar-benar vegan, dst.${historyNote} Seed: ${seed}.${rnd}`;
 
   const p = {
     makan: `${base}\nRekomendasikan 1 jenis makanan. WAJIB ikuti SEMUA filter: dietary (halal/vegan/vegetarian/dll), jenis masakan (Indonesia/Korea/Jepang/Timur Tengah/dll), waktu makan, rasa, dan situasi. Jika user pilih Korea, rekomendasikan makanan Korea. Jika Vegan, harus benar-benar vegan. JANGAN abaikan filter apapun.${fmt}`,
