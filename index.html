@@ -693,10 +693,10 @@ const qData = {
       choices:['😴 Santai','🍿 Serius','😭 Baper','😂 Ketawa'] }
   ],
   kado: [
-    { key:'untuk', txt:'Kado buat siapa? 🎁',
-      choices:['💑 Pasangan','👨‍👩‍👧 Keluarga','👥 Teman','👔 Kolega'] },
-    { key:'budget', txt:'Budget berapa? 💰',
-      choices:['< Rp100rb','Rp100–500rb','> Rp500rb'] }
+    { key:'gender', txt:'Kado untuk siapa? 🎁',
+      choices:['👩 Cewek','👨 Cowok','👫 Keduanya'] },
+    { key:'occasion', txt:'Occasionnya? 🎊',
+      choices:['🎂 Ultah','💍 Pernikahan','🎓 Wisuda','🎄 Hari raya','🎁 Tukar kado','🤝 Perpisahan','💝 Just because'] }
   ],
   nulis: [
     { key:'jenis', txt:'Mau nulis apa? ✍️',
@@ -1149,7 +1149,7 @@ function buildPrompt(isSurprise) {
     jalan: `${base}\nRekomendasikan 1 destinasi atau aktivitas jalan-jalan yang SPESIFIK. WAJIB sesuai SEMUA filter: kota, vibe (alam/seni/shopping/dll), budget, transportasi, dan dengan siapa.${fmt}`,
     baca: `${base}\nRekomendasikan 1 buku atau artikel SPESIFIK (sebutkan judul nyata yang ada). WAJIB sesuai SEMUA filter: format (buku/artikel/audiobook), genre, durasi baca, dan level kesulitan.${fmt}`,
     nonton: `${base}\nRekomendasikan 1 film atau series SPESIFIK yang benar-benar ada. WAJIB sesuai genre, durasi, dan era yang dipilih. Jika dipilih Bollywood, rekomendasikan film Bollywood. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FILM KAPITAL)","alasan":"(1-2 kalimat kenapa cocok, santai & relatable)","genre_film":"(genre film, contoh: Action / Sci-fi / Drama)","rating_usia":"(rating usia, contoh: G / PG / PG-13 / R / 17+ / SU / Dewasa)","sinopsis":"(sinopsis singkat 2-3 kalimat, tidak spoiler)","cast":"(2-3 pemeran utama, dipisah koma)","tahun":"(tahun rilis)","imdb":"(rating IMDB, contoh: 8.2)","tags":["tag1","tag2","tag3"]}`,
-    kado: `${base}\nRekomendasikan 1 ide kado yang SPESIFIK dan kreatif. WAJIB sesuai SEMUA filter: untuk siapa, occasion, budget, usia penerima, dan sifat orangnya.${fmt}`,
+    kado: `${base}\nRekomendasikan 1 ide kado yang SPESIFIK dan kreatif. WAJIB sesuai SEMUA filter: gender penerima (cewek/cowok/keduanya), occasion, budget, usia, dan sifat orangnya. Jika tukar kado, rekomendasikan hadiah yang netral dan cocok untuk semua orang.${fmt}`,
     nulis: `${base}\nBantu atasi writer's block dengan 1 ide tulisan yang konkret dan segar. WAJIB sesuai SEMUA filter: jenis tulisan, bagian yang stuck, platform tujuan, tone, dan panjang tulisan.${fmt}`,
     gebetan: `${base}\nKamu sahabat jujur yang sedikit lucu. Berikan 1 keputusan tegas soal situasi cinta ini. Pilih nama: TEMBAK SEKARANG / TUNGGU DULU / MOVE ON AJA / BICARAIN BAIK-BAIK / GHOSTING BALIK. Nama huruf kapital. Alasan harus UNIK, spesifik ke konteks user, relatable dan sedikit lucu — JANGAN gunakan alasan generik yang sama seperti sebelumnya: ${rekomenHistory.join(' | ')}. Seed: ${seed}.${fmt}`,
     masak: `${base}\nKamu membantu seseorang memutuskan mau masak apa. Rekomendasikan menu lengkap sesuai jumlah hidangan yang diminta. Format output WAJIB seperti ini (jangan tambah teks lain di luar JSON):\n{"emoji":"🍳","nama":"NAMA MENU UTAMA","alasan":"(1-2 kalimat santai kenapa menu ini cocok)","masak_list":"1. NAMA MASAKAN 1\n   bahan utama · ~waktu\n2. NAMA MASAKAN 2\n   bahan utama · ~waktu","fun_fact":"(fun fact menarik tentang salah satu masakan ini, 3 kalimat, bikin hah beneran?!)","tags":["tag1","tag2","tag3"]}`
@@ -1334,8 +1334,8 @@ const extraQ = {
     {key:'orang',txt:'👥 Berapa orang?',choices:['🙋 1 orang','👫 2 orang','👥 3-5 orang','🎉 6+ orang']}
   ],
   kado:[
-    {key:'occasion',txt:'🎊 Occasionnya?',choices:['🎂 Ultah','💍 Pernikahan','🎓 Wisuda','🎄 Hari raya','🤝 Perpisahan','💙 Just because']},
     {key:'usia',txt:'👤 Usia penerima?',choices:['👶 Anak-anak','🧑 Remaja','👨 Dewasa muda','🧓 40+']},
+    {key:'budget',txt:'💰 Budget?',choices:['< Rp100rb','Rp100-500rb','> Rp500rb']},
     {key:'sifat',txt:'🎨 Sifat orangnya?',choices:['🎨 Kreatif','💻 Tech-savvy','🌿 Nature lover','🍽️ Foodie','🏋️ Sporty']}
   ],
   gebetan:[
