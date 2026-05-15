@@ -1290,8 +1290,11 @@ async function fetchPoster(filmTitle, card) {
 }
 
 // ── FUN FACT ──
+// Fun Fact history — track untuk anti-repeat
+var ffHistory = [];
+
 async function getFunFact() {
-  activeTab = 'funfact'; // set tab untuk share text
+  activeTab = 'funfact';
   ke('result');
   const body = document.getElementById('result-body');
   body.innerHTML = '';
@@ -1302,10 +1305,27 @@ async function getFunFact() {
   card.innerHTML = '<div class="load-wrap"><div class="load-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="load-txt">Lagi korek-korek fakta unik...</div></div>';
   body.appendChild(card);
 
-  const topics = (window._ffTopics || CONTENT && CONTENT.funfact_topics) || ['sains','sejarah','teknologi','psikologi','alam'];
-  const topic = topics[Math.floor(Math.random() * topics.length)];
-  const prompt = `Berikan 1 fun fact yang benar-benar menarik dan mengejutkan tentang topik: ${topic}. Fun fact harus bikin orang bilang "hah beneran?!" Balas HANYA JSON tanpa backtick:
-{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA, HURUF KAPITAL, maks 5 kata)","alasan":"(penjelasan fun fact, 3 kalimat, informatif dan mengejutkan)","fun_fact":"","tags":["${topic}","fakta","unik"]}`;
+  // Expanded topics list — lebih bervariasi
+  const allTopics = [
+    'sains fisika kuantum','sejarah Indonesia kuno','psikologi perilaku manusia',
+    'makanan & kuliner dunia','teknologi masa depan','alam & hewan laut',
+    'tubuh manusia','budaya unik dunia','astronomi & luar angkasa',
+    'sejarah perang dunia','biologi evolusi','geografi & bumi',
+    'matematika & angka unik','musik & seni','olahraga & rekor dunia',
+    'ekonomi & uang','bahasa & linguistik','arkeologi & penemuan kuno',
+    'medis & kesehatan unik','hukum aneh di dunia'
+  ];
+
+  // Pilih topik yang belum pernah dipakai
+  const unusedTopics = allTopics.filter(t => !ffHistory.includes(t));
+  const topicPool = unusedTopics.length > 0 ? unusedTopics : allTopics;
+  const topic = topicPool[Math.floor(Math.random() * topicPool.length)];
+
+  const seed = Math.floor(Math.random() * 9999);
+  const histNote = ffHistory.length > 0 ? ` JANGAN ulangi fakta yang sudah pernah: ${ffHistory.slice(-5).join(' | ')}.` : '';
+
+  const prompt = `Berikan 1 fun fact yang BENAR-BENAR mengejutkan dan tidak banyak orang tahu tentang topik: ${topic}.${histNote} Fun fact harus spesifik, ada angka atau data konkret, dan bikin orang bilang "hah beneran?!" Seed: ${seed}. Balas HANYA JSON tanpa backtick:
+{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${topic}","fakta","unik"]}`;
 
   try {
     const res = await fetch('/api/recommend', {
@@ -1320,6 +1340,11 @@ async function getFunFact() {
     const parsed=JSON.parse(clean);
 
     currentRekom={emoji:parsed.emoji||'💡',nama:parsed.nama||'FUN FACT',alasan:parsed.alasan||'',fun_fact:'',tags:parsed.tags||[]};
+    // Save to history
+    ffHistory.push((parsed.nama||'') + ' — ' + (parsed.alasan||'').substring(0,40));
+    if(ffHistory.length > 10) ffHistory.shift();
+    // Save used topic
+    if(!ffHistory.includes(topic)) ffHistory.push(topic);
     const tagHtml=(parsed.tags||[]).map(t=>`<span class="rtag">${t}</span>`).join('');
     card.innerHTML=`<span class="r-emoji">${parsed.emoji||'💡'}</span><div class="r-cat">FUN FACT RANDOM</div><div class="r-nama">${parsed.nama||'FUN FACT'}</div><div class="r-alasan">${parsed.alasan||''}</div><div class="r-tags">${tagHtml}</div>`;
 
