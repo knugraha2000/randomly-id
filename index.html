@@ -570,7 +570,7 @@ body {
   <div style="text-align:center;padding:8px 24px 24px;">
     <a href="/privacy.html" style="font-size:11px;color:#9A9A9A;text-decoration:none;font-weight:500;">Privacy Policy</a>
     <span style="color:#DDD;margin:0 8px;">·</span>
-    <span style="font-size:11px;color:#9A9A9A;">© 2026 randomly.id</span>
+    <span style="font-size:11px;color:#9A9A9A;">randomly.id — lagi random? randomly aja.</span>
   </div>
   <div style="display:none">
   </div>
@@ -1113,11 +1113,29 @@ function buildPrompt(isSurprise) {
 
 // ── SHARE ──
 function getShareText() {
-  if(activeTab==='gebetan'){
-    const ff=currentRekom.fun_fact?'\n\n💡 '+currentRekom.fun_fact:'';
-    return '💘 KEPUTUSAN GEBETAN\n\n'+currentRekom.nama+'\n\n'+currentRekom.alasan+ff+'\n\n— randomly.id udah mutusin buat kamu 😄\ncoba juga: randomly.id';
+  const footer = '\n\nrandomly.id — lagi random? randomly aja.';
+  const ff = currentRekom.fun_fact ? '\n\n💡 ' + currentRekom.fun_fact : '';
+  const masak_list = currentRekom.masak_list ? '\n\n' + currentRekom.masak_list : '';
+
+  if(activeTab === 'gebetan') {
+    return '💘 KEPUTUSAN CINTA\n\n' + currentRekom.nama + '\n\n' + currentRekom.alasan + ff + footer;
   }
-  return `${currentRekom.emoji} ${currentRekom.nama}\n\n${currentRekom.alasan}\n\n— dari randomly.id 🎲\ncoba juga: randomly.id`;
+  if(activeTab === 'masak') {
+    return '🍳 MASAK APA HARI INI\n\n' + currentRekom.nama + '\n\n' + currentRekom.alasan + masak_list + ff + footer;
+  }
+  if(activeTab === 'funfact') {
+    return '💡 FUN FACT\n\n' + currentRekom.nama + '\n\n' + currentRekom.alasan + footer;
+  }
+  const label = {
+    makan: '🍜 REKOMENDASI MAKAN',
+    kado: '🎁 REKOMENDASI KADO',
+    jalan: '🚶 REKOMENDASI JALAN',
+    nonton: '🎬 REKOMENDASI NONTON',
+    baca: '📚 REKOMENDASI BACA',
+    nulis: '✍️ INSPIRASI NULIS'
+  }[activeTab] || '🎲 RANDOMLY';
+
+  return label + '\n\n' + currentRekom.emoji + ' ' + currentRekom.nama + '\n\n' + currentRekom.alasan + ff + footer;
 }
 function shareWA() { window.open('https://wa.me/?text=' + encodeURIComponent(getShareText()), '_blank'); }
 function shareIG() {
