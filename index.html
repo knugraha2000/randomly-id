@@ -275,8 +275,8 @@ body {
 .btn-funfact { width: 100%; padding: 12px; background: #FFF8E7; color: #8A6A00; border: 2px solid var(--ink); border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 var(--ink); }
 .btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
 /* POSTER */
-.poster-wrap { width: 100%; height: 240px; background: #F0F0F0; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 14px; position: relative; }
-.poster-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.3s; }
+.poster-wrap { width: 100%; aspect-ratio: 2/3; max-height: 420px; background: #F0F0F0; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 14px; position: relative; }
+.poster-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; transition: opacity 0.3s; background: #111; }
 .poster-wrap img.loading { opacity: 0; }
 .poster-wrap img.loaded { opacity: 1; }
 .poster-skeleton { width: 100%; height: 100%; background: linear-gradient(90deg, #F0F0F0 25%, #E0E0E0 50%, #F0F0F0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; position: absolute; top: 0; left: 0; }
