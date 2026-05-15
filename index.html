@@ -839,6 +839,7 @@ function pCat(btn, cat) {
   btn.classList.add('on');
   activeTab = cat;
   rekomenHistory = []; // reset history saat ganti kategori
+  answers = {};
   renderQ(cat);
 }
 
@@ -960,9 +961,11 @@ async function getAI(isSurprise) {
       masak_list: parsed.masak_list || '',
       tags: parsed.tags || []
     };
-    // Simpan ke history, max 3
-    rekomenHistory.push(parsed.nama || '');
-    if(rekomenHistory.length > 3) rekomenHistory.shift();
+    // Simpan ke history, max 5
+    const histKey = (parsed.nama || '') + (parsed.alasan ? ' — ' + (parsed.alasan || '').substring(0,40) : '');
+    rekomenHistory.push(histKey);
+    if(rekomenHistory.length > 5) rekomenHistory.shift();
+    if(rekomenHistory.length > 5) rekomenHistory.shift();
 
     if(activeTab === 'masak') {
       renderMasakResult(body, parsed);
@@ -1110,9 +1113,9 @@ function buildPrompt(isSurprise) {
   const fmt = '\nBalas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(HURUF KAPITAL maks 4 kata)","alasan":"(1-2 kalimat santai, relatable, sedikit lucu — dalam tanda kutip)","fun_fact":"(1 fun fact menarik dan singkat, maks 2 kalimat)","tags":["tag1","tag2","tag3"]}';
   const seed = Math.floor(Math.random() * 1000);
   const historyNote = rekomenHistory.length > 0
-    ? ` JANGAN rekomendasikan yang sudah pernah disarankan: ${rekomenHistory.join(', ')}.`
+    ? ` DILARANG KERAS mengulang atau mirip dengan rekomendasi sebelumnya: ${rekomenHistory.join(', ')}. Harus benar-benar berbeda!`
     : '';
-  const base = `Kamu teman yang santai & sedikit lucu. Hari ${hari}, jam ${jam}.00 WIB. Preferensi user: ${ctx}. WAJIB ikuti semua preferensi dengan ketat — jika pilih Korea rekomendasikan makanan Korea, jika Vegan harus benar-benar vegan, dst.${historyNote} Seed: ${seed}.${rnd}`;
+  const base = `Kamu teman yang santai & sedikit lucu. Hari ${hari}, jam ${jam}.00 WIB. Preferensi user: ${ctx}. WAJIB ikuti semua preferensi dengan ketat — jika pilih Korea rekomendasikan makanan Korea, jika Vegan harus benar-benar vegan, dst.${historyNote} Variasi wajib berbeda, seed: ${seed}.${rnd}`;
 
   const p = {
     makan: `${base}\nRekomendasikan 1 jenis makanan. WAJIB ikuti SEMUA filter: dietary (halal/vegan/vegetarian/dll), jenis masakan (Indonesia/Korea/Jepang/Timur Tengah/dll), waktu makan, rasa, dan situasi. Jika user pilih Korea, rekomendasikan makanan Korea. Jika Vegan, harus benar-benar vegan. JANGAN abaikan filter apapun.${fmt}`,
@@ -1121,7 +1124,7 @@ function buildPrompt(isSurprise) {
     nonton: `${base}\nRekomendasikan 1 film atau series SPESIFIK (sebutkan judul nyata yang ada). WAJIB sesuai SEMUA filter: tipe (film/series/stand-up), genre, durasi, dan mood nonton.${fmt}`,
     kado: `${base}\nRekomendasikan 1 ide kado yang SPESIFIK dan kreatif. WAJIB sesuai SEMUA filter: untuk siapa, occasion, budget, usia penerima, dan sifat orangnya.${fmt}`,
     nulis: `${base}\nBantu atasi writer's block dengan 1 ide tulisan yang konkret dan segar. WAJIB sesuai SEMUA filter: jenis tulisan, bagian yang stuck, platform tujuan, tone, dan panjang tulisan.${fmt}`,
-    gebetan: `${base}\nKamu sahabat jujur yang sedikit lucu. Berikan 1 keputusan tegas soal situasi cinta ini. Pilih nama: TEMBAK SEKARANG / TUNGGU DULU / MOVE ON AJA / BICARAIN BAIK-BAIK / GHOSTING BALIK. Nama huruf kapital, alasan relatable dan sedikit lucu. Jangan plinplan.${fmt}`,
+    gebetan: `${base}\nKamu sahabat jujur yang sedikit lucu. Berikan 1 keputusan tegas soal situasi cinta ini. Pilih nama: TEMBAK SEKARANG / TUNGGU DULU / MOVE ON AJA / BICARAIN BAIK-BAIK / GHOSTING BALIK. Nama huruf kapital. Alasan harus UNIK, spesifik ke konteks user, relatable dan sedikit lucu — JANGAN gunakan alasan generik yang sama seperti sebelumnya: ${rekomenHistory.join(' | ')}. Seed: ${seed}.${fmt}`,
     masak: `${base}\nKamu membantu seseorang memutuskan mau masak apa. Rekomendasikan menu lengkap sesuai jumlah hidangan yang diminta. Format output WAJIB seperti ini (jangan tambah teks lain di luar JSON):\n{"emoji":"🍳","nama":"NAMA MENU UTAMA","alasan":"(1-2 kalimat santai kenapa menu ini cocok)","masak_list":"1. NAMA MASAKAN 1\n   bahan utama · ~waktu\n2. NAMA MASAKAN 2\n   bahan utama · ~waktu","fun_fact":"(fun fact menarik tentang salah satu masakan ini, 3 kalimat, bikin hah beneran?!)","tags":["tag1","tag2","tag3"]}`
   };
   return p[activeTab] || p.makan;
