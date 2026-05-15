@@ -319,7 +319,11 @@ body {
 .share-btn-lbl { font-size: 10px; font-weight: 700; color: var(--ink-mid); }
 
 /* ACTION BTNS RESULT */
-.result-actions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.ad-slot { background: #F5F5F5; border: 1px dashed #D0D0D0; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; margin-bottom: 10px; }
+.ad-slot-rect { height: 110px; flex-direction: column; gap: 4px; justify-content: center; text-align: center; }
+.ad-slot-txt { font-size: 10px; color: #A0A0A0; }
+.ad-slot-lbl { font-size: 9px; color: #A0A0A0; border: 1px solid #D0D0D0; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+.result-actions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
 .btn-cari-resto {
   width: 100%; padding: 14px;
   background: var(--ink); color: var(--yellow);
@@ -902,10 +906,10 @@ function submit(isSurprise) {
 
 // ── AI ──
 const loadMsgs = [
-  'Lagi nge-random nih... 🤔',
-  'Konsultasi sama semesta...',
+  'Lagi mikir nih... 🤔',
+  'Konsultasi sama hati nurani...',
   'Hampir jadi, sabar...',
-  'Ini random, jangan buru-buru... 😄'
+  'Ini penting, jangan buru-buru... 😄'
 ];
 
 async function getAI(isSurprise) {
@@ -991,6 +995,12 @@ function renderResult(body) {
     ${ffHtml}
     <div class="r-tags">${tagHtml}</div>`;
 
+  // Ad rectangle — ganti kode AdSense setelah approved
+  const adRect = document.createElement('div');
+  adRect.className = 'ad-slot ad-slot-rect';
+  adRect.innerHTML = '<span class="ad-slot-txt">Iklan — Google AdSense</span><span class="ad-slot-lbl">Iklan</span>';
+  body.appendChild(adRect);
+
   // Share
   const shareWrap = document.createElement('div');
   shareWrap.className = 'share-wrap';
@@ -1016,6 +1026,12 @@ function addActions(body) {
   html += `<button class="btn-lagi" onclick="submitGanti()">🔄 Gak cocok? Ganti!</button>`;
   wrap.innerHTML = html;
   body.appendChild(wrap);
+
+  // Ad strip bottom — ganti kode AdSense setelah approved
+  const adStrip = document.createElement('div');
+  adStrip.className = 'ad-slot';
+  adStrip.innerHTML = '<span class="ad-slot-txt">Iklan — Google AdSense</span><span class="ad-slot-lbl">Iklan</span>';
+  body.appendChild(adStrip);
 }
 
 // ── PAYWALL UI ──
