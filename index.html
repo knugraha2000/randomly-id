@@ -980,6 +980,8 @@ async function getAI(isSurprise) {
       tahun: parsed.tahun || '',
       imdb: parsed.imdb || '',
       author: parsed.author || '',
+      goodreads: parsed.goodreads || '',
+      baca_sinopsis: parsed.sinopsis && activeTab === 'baca' ? parsed.sinopsis : (parsed.sinopsis || ''),
       tags: parsed.tags || []
     };
     // Simpan ke history, max 5
@@ -1009,7 +1011,7 @@ function renderResult(body) {
     `<span class="rtag">${t}</span>`).join('');
 
   // Fun fact — only show for non-nonton categories
-  const ffHtml = (activeTab !== 'nonton' && currentRekom.fun_fact)
+  const ffHtml = (activeTab !== 'nonton' && activeTab !== 'baca' && currentRekom.fun_fact)
     ? `<div class="fun-fact"><div class="ff-label">💡 Fun Fact</div><div class="ff-txt">${currentRekom.fun_fact}</div></div>`
     : '';
 
@@ -1019,13 +1021,15 @@ function renderResult(body) {
     fetchPoster(currentRekom.nama, card);
   }
 
-  // Baca meta — author + tahun
-  const bacaMeta = (activeTab === 'baca' && (currentRekom.author || currentRekom.tahun))
+  // Baca meta — author + tahun + goodreads + sinopsis
+  const bacaMeta = (activeTab === 'baca')
     ? `<div class="nonton-meta">
         <div class="nmeta-badges">
-          ${currentRekom.author ? `<span class="nmeta-item">✍️ ${currentRekom.author}</span>` : ''}
           ${currentRekom.tahun ? `<span class="nmeta-item">📅 ${currentRekom.tahun}</span>` : ''}
+          ${currentRekom.goodreads ? `<span class="nmeta-item">⭐ GR ${currentRekom.goodreads}</span>` : ''}
+          ${currentRekom.author ? `<div class="nmeta-cast">✍️ ${currentRekom.author}</div>` : ''}
         </div>
+        ${currentRekom.sinopsis ? `<div class="nmeta-sinopsis">${currentRekom.sinopsis}</div>` : ''}
       </div>` : '';
 
   const nontonMeta = (activeTab === 'nonton' && (currentRekom.tahun || currentRekom.imdb || currentRekom.sinopsis))
@@ -1176,7 +1180,7 @@ function buildPrompt(isSurprise) {
   const p = {
     makan: `${base}\nRekomendasikan 1 jenis makanan. WAJIB ikuti SEMUA filter: dietary (halal/vegan/vegetarian/dll), jenis masakan (Indonesia/Korea/Jepang/Timur Tengah/dll), waktu makan, rasa, dan situasi. Jika user pilih Korea, rekomendasikan makanan Korea. Jika Vegan, harus benar-benar vegan. JANGAN abaikan filter apapun.${fmt}`,
     jalan: `${base}\nRekomendasikan 1 destinasi atau aktivitas jalan-jalan yang SPESIFIK. WAJIB sesuai SEMUA filter: kota, vibe (alam/seni/shopping/dll), budget, transportasi, dan dengan siapa.${fmt}`,
-    baca: `${base}\nRekomendasikan 1 buku atau artikel SPESIFIK yang benar-benar ada dan bisa ditemukan. WAJIB sesuai SEMUA filter: format, genre, durasi, level kesulitan. PENTING: Jangan rekomendasikan buku mainstream yang semua orang sudah tahu (Atomic Habits, Rich Dad Poor Dad, 5AM Club, dll) kecuali diminta. Pilih hidden gem berkualitas yang jarang direkomendasikan. Seed: ${seed}. Balas HANYA JSON: {"emoji":"(1 emoji)","nama":"(JUDUL BUKU KAPITAL)","alasan":"(kenapa cocok, 1-2 kalimat santai)","author":"(nama penulis)","tahun":"(tahun terbit)","fun_fact":"(1 hal menarik tentang buku ini, 3 kalimat)","tags":["tag1","tag2","tag3"]}`,
+    baca: `${base}\nRekomendasikan 1 buku SPESIFIK yang benar-benar ada. WAJIB sesuai SEMUA filter: format, genre, durasi, level. PENTING: Hindari buku mainstream (Atomic Habits, Rich Dad Poor Dad, 5AM Club, dll) kecuali diminta. Pilih hidden gem berkualitas. Seed: ${seed}. Balas HANYA JSON: {"emoji":"(1 emoji)","nama":"(JUDUL BUKU KAPITAL)","alasan":"(kenapa cocok, 1-2 kalimat santai)","author":"(nama penulis)","tahun":"(tahun terbit)","goodreads":"(rating Goodreads, contoh: 4.2)","sinopsis":"(sinopsis singkat 2-3 kalimat, tidak spoiler)","tags":["tag1","tag2","tag3"]}`,
     nonton: `${base}\nRekomendasikan 1 film atau series SPESIFIK yang benar-benar ada. WAJIB sesuai genre, durasi, dan era yang dipilih. Jika dipilih Bollywood, rekomendasikan film Bollywood. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FILM KAPITAL)","alasan":"(1-2 kalimat kenapa cocok, santai & relatable)","genre_film":"(genre film, contoh: Action / Sci-fi / Drama)","rating_usia":"(rating usia, contoh: G / PG / PG-13 / R / 17+ / SU / Dewasa)","sinopsis":"(sinopsis singkat 2-3 kalimat, tidak spoiler)","cast":"(2-3 pemeran utama, dipisah koma)","tahun":"(tahun rilis)","imdb":"(rating IMDB, contoh: 8.2)","tags":["tag1","tag2","tag3"]}`,
     kado: `${base}\nRekomendasikan 1 ide kado yang SPESIFIK dan kreatif. WAJIB sesuai SEMUA filter: gender penerima (cewek/cowok/keduanya), occasion, budget, usia, dan sifat orangnya. Jika tukar kado, rekomendasikan hadiah yang netral dan cocok untuk semua orang.${fmt}`,
     nulis: `${base}\nBantu atasi writer's block dengan 1 ide tulisan yang konkret dan segar. WAJIB sesuai SEMUA filter: jenis tulisan, bagian yang stuck, platform tujuan, tone, dan panjang tulisan.${fmt}`,
@@ -1210,8 +1214,10 @@ function getShareText() {
     return '💡 FUN FACT\n\n' + currentRekom.nama + '\n\n' + currentRekom.alasan + footer;
   }
   if(activeTab === 'baca') {
-    const authorTahun = [currentRekom.author, currentRekom.tahun].filter(Boolean).join(', ');
-    return '📚 REKOMENDASI BACA\n\n' + currentRekom.emoji + ' ' + currentRekom.nama + (authorTahun ? '\n✍️ ' + authorTahun : '') + '\n\n' + currentRekom.alasan + ff + footer;
+    const grMeta = (currentRekom.tahun ? '📅 ' + currentRekom.tahun : '') + (currentRekom.goodreads ? '  ⭐ GR ' + currentRekom.goodreads : '');
+    const bacaSinopsis = currentRekom.sinopsis ? '\n\n' + currentRekom.sinopsis : '';
+    const bacaAuthor = currentRekom.author ? '\n✍️ ' + currentRekom.author : '';
+    return '📚 REKOMENDASI BACA\n\n' + currentRekom.emoji + ' ' + currentRekom.nama + (grMeta ? '\n' + grMeta : '') + bacaAuthor + '\n\n' + currentRekom.alasan + bacaSinopsis + footer;
   }
   const label = {
     makan: '🍜 REKOMENDASI MAKAN',
