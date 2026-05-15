@@ -274,6 +274,14 @@ body {
 .city-input:focus { border-color: var(--ink); }
 .btn-funfact { width: 100%; padding: 12px; background: #FFF8E7; color: #8A6A00; border: 2px solid var(--ink); border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 var(--ink); }
 .btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+/* POSTER */
+.poster-wrap { width: 100%; height: 240px; background: #F0F0F0; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 14px; position: relative; }
+.poster-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.3s; }
+.poster-wrap img.loading { opacity: 0; }
+.poster-wrap img.loaded { opacity: 1; }
+.poster-skeleton { width: 100%; height: 100%; background: linear-gradient(90deg, #F0F0F0 25%, #E0E0E0 50%, #F0F0F0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; position: absolute; top: 0; left: 0; }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.poster-skeleton.done { display: none; }
 .nonton-meta { background: rgba(0,0,0,0.05); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .nmeta-item { font-size: 12px; font-weight: 700; color: var(--ink); background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 3px 10px; }
 .nmeta-badges { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -1005,6 +1013,11 @@ function renderResult(body) {
     : '';
 
   // Extra info for nonton
+  // Fetch TMDB poster for nonton
+  if(activeTab === 'nonton' && currentRekom.nama) {
+    fetchPoster(currentRekom.nama, card);
+  }
+
   const nontonMeta = (activeTab === 'nonton' && (currentRekom.tahun || currentRekom.imdb || currentRekom.sinopsis))
     ? `<div class="nonton-meta">
         <div class="nmeta-badges">
@@ -1017,8 +1030,13 @@ function renderResult(body) {
         ${currentRekom.cast ? `<div class="nmeta-cast">🎭 ${currentRekom.cast}</div>` : ''}
       </div>` : '';
 
+  const posterHtml = activeTab === 'nonton'
+    ? `<div class="poster-wrap" id="poster-wrap"><div class="poster-skeleton" id="poster-skeleton"></div></div>`
+    : '';
+
   card.innerHTML = `
-    <span class="r-emoji">${currentRekom.emoji}</span>
+    ${posterHtml}
+    <span class="r-emoji" ${activeTab === 'nonton' ? 'style="display:none"' : ''}>${currentRekom.emoji}</span>
     <div class="r-cat">${catLabels[activeTab]||'REKOMENDASI'}</div>
     <div class="r-nama">${currentRekom.nama}</div>
     ${nontonMeta}
@@ -1204,6 +1222,50 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── TMDB POSTER ──
+async function fetchPoster(filmTitle, card) {
+  try {
+    const res = await fetch('/api/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fetch_poster: true, film_title: filmTitle })
+    });
+    const data = await res.json();
+    const posterWrap = document.getElementById('poster-wrap');
+    const skeleton = document.getElementById('poster-skeleton');
+    if(!posterWrap) return;
+
+    if(data.poster_url) {
+      const img = document.createElement('img');
+      img.className = 'loading';
+      img.alt = filmTitle;
+      img.onload = function() {
+        img.classList.remove('loading');
+        img.classList.add('loaded');
+        if(skeleton) skeleton.classList.add('done');
+      };
+      img.onerror = function() {
+        posterWrap.style.display = 'none';
+        // Show emoji back
+        const emoji = card.querySelector('.r-emoji');
+        if(emoji) emoji.style.display = '';
+      };
+      img.src = data.poster_url;
+      posterWrap.appendChild(img);
+    } else {
+      // No poster — hide wrap, show emoji
+      posterWrap.style.display = 'none';
+      const emoji = card.querySelector('.r-emoji');
+      if(emoji) emoji.style.display = '';
+    }
+  } catch(e) {
+    const posterWrap = document.getElementById('poster-wrap');
+    if(posterWrap) posterWrap.style.display = 'none';
+    const emoji = card ? card.querySelector('.r-emoji') : null;
+    if(emoji) emoji.style.display = '';
+  }
 }
 
 // ── FUN FACT ──
