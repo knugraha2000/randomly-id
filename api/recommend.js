@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5-20250929',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: max_tokens || 400,
         system: 'You are a helpful assistant. Always respond with valid JSON only. No markdown, no backticks, no explanation. Just raw JSON.',
         messages: messages
@@ -30,16 +30,7 @@ export default async function handler(req, res) {
       return res.status(response.status).json({ error: data });
     }
 
-    // Parse the text response into JSON
-    const text = data.content?.[0]?.text || '{}';
-    const clean = text.replace(/```json|```/g, '').trim();
-    
-    try {
-      const parsed = JSON.parse(clean);
-      return res.status(200).json({ content: [{ text: JSON.stringify(parsed) }] });
-    } catch(e) {
-      return res.status(200).json(data);
-    }
+    return res.status(200).json(data);
 
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error', detail: error.message });
