@@ -278,6 +278,7 @@ body {
 .nmeta-item { font-size: 12px; font-weight: 700; color: var(--ink); background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 3px 10px; }
 .nmeta-badges { display: flex; gap: 6px; flex-wrap: wrap; }
 .nmeta-sinopsis { font-size: 12px; color: var(--ink-mid); line-height: 1.6; font-weight: 400; margin-top: 6px; font-style: italic; }
+.nmeta-cast { font-size: 11px; color: var(--ink-mid); font-weight: 600; margin-top: 4px; }
 .masak-list { background: rgba(0,0,0,0.04); border-radius: var(--rs); padding: 12px 14px; margin-bottom: 12px; text-align: left; }
 .masak-item { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
 .masak-detail { font-size: 11px; color: var(--inkm); margin-bottom: 10px; font-weight: 400; }
@@ -964,6 +965,7 @@ async function getAI(isSurprise) {
       fun_fact: parsed.fun_fact || '',
       masak_list: parsed.masak_list || '',
       sinopsis: parsed.sinopsis || '',
+      cast: parsed.cast || '',
       tahun: parsed.tahun || '',
       imdb: parsed.imdb || '',
       tags: parsed.tags || []
@@ -1006,6 +1008,7 @@ function renderResult(body) {
           ${currentRekom.imdb ? `<span class="nmeta-item">⭐ IMDB ${currentRekom.imdb}</span>` : ''}
         </div>
         ${currentRekom.sinopsis ? `<div class="nmeta-sinopsis">${currentRekom.sinopsis}</div>` : ''}
+        ${currentRekom.cast ? `<div class="nmeta-cast">🎭 ${currentRekom.cast}</div>` : ''}
       </div>` : '';
 
   card.innerHTML = `
@@ -1139,7 +1142,7 @@ function buildPrompt(isSurprise) {
     makan: `${base}\nRekomendasikan 1 jenis makanan. WAJIB ikuti SEMUA filter: dietary (halal/vegan/vegetarian/dll), jenis masakan (Indonesia/Korea/Jepang/Timur Tengah/dll), waktu makan, rasa, dan situasi. Jika user pilih Korea, rekomendasikan makanan Korea. Jika Vegan, harus benar-benar vegan. JANGAN abaikan filter apapun.${fmt}`,
     jalan: `${base}\nRekomendasikan 1 destinasi atau aktivitas jalan-jalan yang SPESIFIK. WAJIB sesuai SEMUA filter: kota, vibe (alam/seni/shopping/dll), budget, transportasi, dan dengan siapa.${fmt}`,
     baca: `${base}\nRekomendasikan 1 buku atau artikel SPESIFIK (sebutkan judul nyata yang ada). WAJIB sesuai SEMUA filter: format (buku/artikel/audiobook), genre, durasi baca, dan level kesulitan.${fmt}`,
-    nonton: `${base}\nRekomendasikan 1 film atau series SPESIFIK yang benar-benar ada. WAJIB sesuai genre, durasi, dan era yang dipilih. Jika dipilih Bollywood, rekomendasikan film Bollywood. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FILM KAPITAL)","alasan":"(1-2 kalimat kenapa cocok, santai & relatable)","sinopsis":"(sinopsis singkat 2-3 kalimat, tidak spoiler)","tahun":"(tahun rilis)","imdb":"(rating IMDB, contoh: 8.2)","fun_fact":"(1 fakta menarik tentang film ini, 3 kalimat)","tags":["tag1","tag2","tag3"]}`,
+    nonton: `${base}\nRekomendasikan 1 film atau series SPESIFIK yang benar-benar ada. WAJIB sesuai genre, durasi, dan era yang dipilih. Jika dipilih Bollywood, rekomendasikan film Bollywood. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FILM KAPITAL)","alasan":"(1-2 kalimat kenapa cocok, santai & relatable)","sinopsis":"(sinopsis singkat 2-3 kalimat, tidak spoiler)","cast":"(2-3 pemeran utama, dipisah koma)","tahun":"(tahun rilis)","imdb":"(rating IMDB, contoh: 8.2)","fun_fact":"(1 fakta menarik tentang film ini, 3 kalimat)","tags":["tag1","tag2","tag3"]}`,
     kado: `${base}\nRekomendasikan 1 ide kado yang SPESIFIK dan kreatif. WAJIB sesuai SEMUA filter: untuk siapa, occasion, budget, usia penerima, dan sifat orangnya.${fmt}`,
     nulis: `${base}\nBantu atasi writer's block dengan 1 ide tulisan yang konkret dan segar. WAJIB sesuai SEMUA filter: jenis tulisan, bagian yang stuck, platform tujuan, tone, dan panjang tulisan.${fmt}`,
     gebetan: `${base}\nKamu sahabat jujur yang sedikit lucu. Berikan 1 keputusan tegas soal situasi cinta ini. Pilih nama: TEMBAK SEKARANG / TUNGGU DULU / MOVE ON AJA / BICARAIN BAIK-BAIK / GHOSTING BALIK. Nama huruf kapital. Alasan harus UNIK, spesifik ke konteks user, relatable dan sedikit lucu — JANGAN gunakan alasan generik yang sama seperti sebelumnya: ${rekomenHistory.join(' | ')}. Seed: ${seed}.${fmt}`,
@@ -1163,7 +1166,8 @@ function getShareText() {
   if(activeTab === 'nonton') {
     const meta = (currentRekom.tahun ? '📅 ' + currentRekom.tahun : '') + (currentRekom.imdb ? '  ⭐ IMDB ' + currentRekom.imdb : '');
     const sinopsis = currentRekom.sinopsis ? '\n\n' + currentRekom.sinopsis : '';
-    return '🎬 REKOMENDASI NONTON\n\n' + currentRekom.emoji + ' ' + currentRekom.nama + (meta ? '\n' + meta : '') + '\n\n' + currentRekom.alasan + sinopsis + ff + footer;
+    const cast = currentRekom.cast ? '\n🎭 ' + currentRekom.cast : '';
+    return '🎬 REKOMENDASI NONTON\n\n' + currentRekom.emoji + ' ' + currentRekom.nama + (meta ? '\n' + meta : '') + cast + '\n\n' + currentRekom.alasan + sinopsis + ff + footer;
   }
   if(activeTab === 'funfact') {
     return '💡 FUN FACT\n\n' + currentRekom.nama + '\n\n' + currentRekom.alasan + footer;
