@@ -1453,12 +1453,12 @@ function dismissSplash() {
   if(!splash) return;
   splash.classList.add('fade-out');
   setTimeout(function() { splash.classList.add('hidden'); }, 500);
-  localStorage.setItem('rnd_splash_seen', '1');
+  sessionStorage.setItem('rnd_splash_seen', '1');
 }
 
 function initSplash() {
   // Kalau sudah pernah lihat splash, skip
-  if(localStorage.getItem('rnd_splash_seen')) {
+  if(sessionStorage.getItem('rnd_splash_seen')) {
     const splash = document.getElementById('splash-screen');
     if(splash) splash.classList.add('hidden');
     return;
