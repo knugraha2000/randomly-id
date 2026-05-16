@@ -572,7 +572,7 @@ body {
 <!-- SPLASH SCREEN -->
 <div id="splash-screen">
   <img src="/logo-splash.png" alt="randomly.id" class="splash-logo">
-  <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#333;text-align:center;max-width:280px;line-height:1.6;margin-top:16px;padding:0 24px;">Platform rekomendasi AI pertama di Indonesia. Solusi ke-random-an kamu dengan 8 kategori plus bonus random fun fact yang bikin seru. 🎲</p>
+  <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:#333;text-align:center;max-width:280px;line-height:1.7;margin-top:16px;padding:0 24px;">Platform rekomendasi AI pertama di Indonesia. Solusi ke-random-an kamu dengan 8 kategori plus bonus random fun fact yang bikin seru. 🎲</p>
   <button class="splash-skip" onclick="dismissSplash()">Skip</button>
 </div>
 
@@ -1464,7 +1464,7 @@ function initSplash() {
     return;
   }
   // Auto dismiss setelah 2.5 detik
-  setTimeout(dismissSplash, 4000);
+  setTimeout(dismissSplash, 10000);
   // Tap anywhere to dismiss
   document.getElementById('splash-screen').addEventListener('click', dismissSplash);
 }
