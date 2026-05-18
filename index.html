@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -917,6 +917,7 @@ function pCat(btn, cat) {
   rekomenHistory = loadRekomenHistory(cat); // load history per kategori
   answers = {};
   renderQ(cat);
+  if(typeof gtag !== 'undefined') gtag('event', 'tab_click', { kategori: cat });
 }
 
 // ── PAYWALL ──
@@ -948,6 +949,9 @@ function resetAll() {
 
 // ── SUBMIT ──
 function submit(isSurprise) {
+  if(typeof gtag !== 'undefined') gtag('event', 'rekomendasi_request', {
+    kategori: activeTab, mode: isSurprise ? 'gabut' : 'normal'
+  });
   checkPaywall();
 
   if (cooldownUntil > 0 && Date.now() < cooldownUntil) {
@@ -1029,6 +1033,10 @@ async function getAI(isSurprise) {
     if(j1 > -1 && j2 > -1) clean = clean.substring(j1, j2+1);
     const parsed = JSON.parse(clean);
 
+    if(typeof gtag !== 'undefined') gtag('event', 'rekomendasi_success', {
+      kategori: activeTab,
+      nama: parsed.nama || ''
+    });
     currentRekom = {
       emoji: parsed.emoji || '🎯',
       nama: parsed.nama || '—',
@@ -1292,7 +1300,10 @@ function getShareText() {
 
   return label + '\n\n' + currentRekom.emoji + ' ' + currentRekom.nama + '\n\n' + currentRekom.alasan + ff + footer;
 }
-function shareWA() { window.open('https://wa.me/?text=' + encodeURIComponent(getShareText()), '_blank'); }
+function shareWA() {
+  if(typeof gtag !== 'undefined') gtag('event', 'share_wa', { kategori: activeTab });
+  window.open('https://wa.me/?text=' + encodeURIComponent(getShareText()), '_blank');
+}
 function closeModal() { document.getElementById('ig-modal').classList.remove('show'); }
 function copyFromModal() {
   navigator.clipboard.writeText(getShareText()).then(() => {
@@ -1300,7 +1311,10 @@ function copyFromModal() {
     closeModal();
   });
 }
-function copyTeks() { navigator.clipboard.writeText(getShareText()).then(() => showToast('✓ Teks disalin!')); }
+function copyTeks() {
+  if(typeof gtag !== 'undefined') gtag('event', 'copy_teks', { kategori: activeTab });
+  navigator.clipboard.writeText(getShareText()).then(() => showToast('✓ Teks disalin!'));
+}
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -1358,6 +1372,7 @@ var ffHistory = JSON.parse(localStorage.getItem('rnd_ff_history') || '[]');
 var ffTopicHistory = JSON.parse(localStorage.getItem('rnd_ff_topics') || '[]');
 
 async function getFunFact() {
+  if(typeof gtag !== 'undefined') gtag('event', 'fun_fact_click', {});
   activeTab = 'funfact';
   ke('result');
   const body = document.getElementById('result-body');
@@ -1452,6 +1467,7 @@ function renderMasakResult(body, parsed) {
 
 // ── SUBMIT GANTI ──
 function submitGanti() {
+  if(typeof gtag !== 'undefined') gtag('event', 'ganti_rekomendasi', { kategori: activeTab });
   // Force different by temporarily adding random hint to answers
   const oldHint = answers._hint;
   answers._hint = 'coba yang berbeda, jangan ulangi yang sama, variasi ' + Math.random();
