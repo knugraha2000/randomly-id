@@ -877,11 +877,17 @@ function renderQ(tab) {
         if(btn.classList.contains('on')){
           btn.classList.remove('on'); delete answers[q.key];
           if(cityInput) cityInput.style.display = 'none';
+          // Reset history saat filter diubah
+          rekomenHistory = [];
+          saveRekomenHistory(activeTab, []);
           checkReady(); return;
         }
         chips.querySelectorAll('.chip').forEach(b => b.classList.remove('on'));
         btn.classList.add('on');
         answers[q.key] = choice;
+        // Reset history saat filter berubah
+        rekomenHistory = [];
+        saveRekomenHistory(activeTab, []);
         if(cityInput) cityInput.style.display = 'none';
         checkReady();
       };
