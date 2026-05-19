@@ -842,6 +842,11 @@ function renderQ(tab) {
     const autoVal = (q.auto && tab === 'makan') ? getAutoWaktu() : null;
     if (autoVal) answers[q.key] = autoVal;
 
+    // Set default pilihan pertama jika belum ada jawaban
+    if(!answers[q.key] && !q.hasInput && q.choices && q.choices.length > 0) {
+      answers[q.key] = q.choices[0];
+    }
+
     // City input for jalan
     var cityInput = null;
     if(q.hasInput) {
@@ -1507,7 +1512,7 @@ function initSplash() {
     return;
   }
   // Auto dismiss setelah 2.5 detik
-  setTimeout(dismissSplash, 10000);
+  setTimeout(dismissSplash, 5000);
   // Tap anywhere to dismiss
   document.getElementById('splash-screen').addEventListener('click', dismissSplash);
 }
