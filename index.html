@@ -1436,7 +1436,7 @@ async function getFunFact() {
   const topic = topicPool[Math.floor(Math.random() * topicPool.length)];
 
   const seed = Math.floor(Math.random() * 9999);
-  const histNote = ffHistory.length > 0 ? ` JANGAN ulangi fakta yang sudah pernah: ${ffHistory.slice(-5).join(' | ')}.` : '';
+  const histNote = ffHistory.length > 0 ? ` PENTING: DILARANG KERAS mengulang topik atau fakta yang sudah pernah diberikan sebelumnya. Fakta yang SUDAH PERNAH MUNCUL dan HARUS DIHINDARI: [${ffHistory.slice(-10).join(' | ')}]. Pilih topik yang BENAR-BENAR BERBEDA!` : '';
 
   const prompt = `Berikan 1 fun fact yang BENAR-BENAR mengejutkan dan tidak banyak orang tahu. Tema wajib: "${randomTema}". Topik spesifik: ${topic}.${histNote} Fun fact harus spesifik, ada angka atau data konkret, dan bikin orang bilang "hah beneran?!" Seed: ${seed}. Balas HANYA JSON tanpa backtick:
 {"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${randomTema}","${topic}","fakta"]}`;
@@ -1456,9 +1456,11 @@ async function getFunFact() {
     currentRekom={emoji:parsed.emoji||'💡',nama:parsed.nama||'FUN FACT',alasan:parsed.alasan||'',fun_fact:'',tags:parsed.tags||[]};
     // Save to history
     // Save fun fact to persistent history
-    const ffKey = (parsed.nama||'') + ' — ' + (parsed.alasan||'').substring(0,40);
-    ffHistory.push(ffKey);
-    if(ffHistory.length > 20) ffHistory.shift();
+    const ffKey = (parsed.nama||'').toUpperCase().trim();
+    if(ffKey && !ffHistory.includes(ffKey)) {
+      ffHistory.push(ffKey);
+    }
+    if(ffHistory.length > 30) ffHistory.shift();
     localStorage.setItem('rnd_ff_history', JSON.stringify(ffHistory));
 
     // Save used topic to persistent history
