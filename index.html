@@ -602,7 +602,7 @@ body {
   </div>
 
   <!-- FUN FACT BUTTON -->
-  <div style="padding: 0 20px 12px;">
+  <div style="padding: 12px 20px 12px;">
     <button class="btn-funfact" onclick="getFunFact()" id="btn-funfact" style="width:100%;"></button>
   </div>
 
@@ -1402,44 +1402,13 @@ async function getFunFact() {
   body.appendChild(card);
 
   // Expanded topics list — lebih bervariasi
-  // Kategori tema untuk variasi fun fact
-  const temaList = [
-    'hewan','manusia & tubuh','Asia','Amerika','Eropa','Afrika','Oseania',
-    'teknologi','sejarah kuno','sejarah modern','kesehatan & medis',
-    'bahasa & linguistik','budaya unik','negara & geografi','makanan & kuliner',
-    'musik','seni & desain','hobi & olahraga','rekor dunia','luar angkasa',
-    'alam & lingkungan','psikologi','ekonomi & uang','hukum aneh',
-    'agama & kepercayaan','penemuan ilmiah','matematika','biologi',
-    'fisika','kimia','arkeologi','mitologi','film & hiburan','sosial media',
-    'transportasi','arsitektur','fashion','olahraga ekstrem','politik sejarah'
-  ];
+  const seed = Math.floor(Math.random() * 999999);
+  const histNote = ffHistory.length > 0
+    ? ` Fakta-fakta berikut SUDAH PERNAH DIBERIKAN, JANGAN diulang: [${ffHistory.slice(-15).join(' | ')}].`
+    : '';
 
-  // Pilih tema random yang belum dipakai
-  const unusedTema = temaList.filter(t => !ffTopicHistory.includes(t));
-  const temaPool = unusedTema.length > 0 ? unusedTema : temaList;
-  const randomTema = temaPool[Math.floor(Math.random() * temaPool.length)];
-
-  // Pilih sub-topik random dalam tema
-  const allTopics = [
-    'sains fisika kuantum','sejarah Indonesia kuno','psikologi perilaku manusia',
-    'makanan & kuliner dunia','teknologi masa depan','alam & hewan laut',
-    'tubuh manusia','budaya unik dunia','astronomi & luar angkasa',
-    'sejarah perang dunia','biologi evolusi','geografi & bumi',
-    'matematika & angka unik','musik & seni','olahraga & rekor dunia',
-    'ekonomi & uang','bahasa & linguistik','arkeologi & penemuan kuno',
-    'medis & kesehatan unik','hukum aneh di dunia'
-  ];
-
-  // Pilih topik yang belum pernah dipakai
-  const unusedTopics = allTopics.filter(t => !ffTopicHistory.includes(t));
-  const topicPool = unusedTopics.length > 0 ? unusedTopics : allTopics;
-  const topic = topicPool[Math.floor(Math.random() * topicPool.length)];
-
-  const seed = Math.floor(Math.random() * 9999);
-  const histNote = ffHistory.length > 0 ? ` PENTING: DILARANG KERAS mengulang topik atau fakta yang sudah pernah diberikan sebelumnya. Fakta yang SUDAH PERNAH MUNCUL dan HARUS DIHINDARI: [${ffHistory.slice(-10).join(' | ')}]. Pilih topik yang BENAR-BENAR BERBEDA!` : '';
-
-  const prompt = `Berikan 1 fun fact yang BENAR-BENAR mengejutkan dan tidak banyak orang tahu. Tema wajib: "${randomTema}". Topik spesifik: ${topic}.${histNote} Fun fact harus spesifik, ada angka atau data konkret, dan bikin orang bilang "hah beneran?!" Seed: ${seed}. Balas HANYA JSON tanpa backtick:
-{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${randomTema}","${topic}","fakta"]}`;
+  const prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact yang benar-benar mengejutkan dan tidak banyak orang tahu. Pilih sendiri topiknya dari mana saja — hewan, manusia, sejarah, teknologi, negara, bahasa, makanan, musik, olahraga, sains, budaya, rekor, atau topik lain yang kamu anggap paling mengejutkan.${histNote} Fun fact harus spesifik dengan angka atau data konkret. Seed variasi: ${seed}. Balas HANYA JSON tanpa backtick:
+{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
 
   try {
     const res = await fetch('/api/recommend', {
@@ -1455,16 +1424,16 @@ async function getFunFact() {
 
     currentRekom={emoji:parsed.emoji||'💡',nama:parsed.nama||'FUN FACT',alasan:parsed.alasan||'',fun_fact:'',tags:parsed.tags||[]};
     // Save to history
-    // Save fun fact to persistent history
-    const ffKey = (parsed.nama||'').toUpperCase().trim();
-    if(ffKey && !ffHistory.includes(ffKey)) {
-      ffHistory.push(ffKey);
+    // Save fun fact to persistent history — judul pendek saja
+    const ffWords = (parsed.nama||'').toUpperCase().trim().split(' ').slice(0,3).join(' ');
+    if(ffWords && !ffHistory.includes(ffWords)) {
+      ffHistory.push(ffWords);
     }
     if(ffHistory.length > 30) ffHistory.shift();
     localStorage.setItem('rnd_ff_history', JSON.stringify(ffHistory));
 
     // Save used topic to persistent history
-    ffTopicHistory.push(randomTema);
+    // Topic history - simpan nama fakta saja
     if(ffTopicHistory.length > 40) ffTopicHistory.shift();
     localStorage.setItem('rnd_ff_topics', JSON.stringify(ffTopicHistory));
     const tagHtml=(parsed.tags||[]).map(t=>`<span class="rtag">${t}</span>`).join('');
