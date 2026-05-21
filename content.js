@@ -41,7 +41,7 @@ const CONTENT = {
   // ── TOMBOL AKSI ──
   btn_rekomendasi: 'Rekomendasi →',
   btn_gabut: '🎲 Gabut Mode — acak semua!',
-  btn_funfact: '💡 Fun Fact Random',
+  btn_funfact: '🎲 Randomin Fun Fact Dong!',
   btn_ganti: '🔄 Gak cocok? Ganti!',
   btn_kategori_lain: '↩️ Coba kategori lain',
   btn_funfact_lain: '🔄 Fun Fact lain!',
