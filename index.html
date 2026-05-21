@@ -1070,9 +1070,11 @@ async function getAI(isSurprise) {
       tags: parsed.tags || []
     };
     // Simpan ke history, max 5
-    const histKey = (parsed.nama || '') + (parsed.alasan ? ' — ' + (parsed.alasan || '').substring(0,40) : '');
-    rekomenHistory.push(histKey);
-    if(rekomenHistory.length > 10) rekomenHistory.shift();
+    const histKey = (parsed.nama || '').toUpperCase().trim();
+    if(histKey && !rekomenHistory.includes(histKey)) {
+      rekomenHistory.push(histKey);
+    }
+    if(rekomenHistory.length > 15) rekomenHistory.shift();
     saveRekomenHistory(activeTab, rekomenHistory);
 
     if(activeTab === 'masak') {
@@ -1258,7 +1260,7 @@ function buildPrompt(isSurprise) {
   const fmt = '\nBalas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(HURUF KAPITAL maks 4 kata)","alasan":"(1-2 kalimat santai, relatable, sedikit lucu — dalam tanda kutip)","fun_fact":"(1 fun fact menarik dan singkat, maks 2 kalimat)","tags":["tag1","tag2","tag3"]}';
   const seed = Math.floor(Math.random() * 1000);
   const historyNote = rekomenHistory.length > 0
-    ? ` DILARANG KERAS mengulang atau mirip dengan rekomendasi sebelumnya: ${rekomenHistory.join(', ')}. Harus benar-benar berbeda!`
+    ? ` PENTING: DILARANG KERAS merekomendasikan item berikut yang sudah pernah muncul sebelumnya: [${rekomenHistory.join(' | ')}]. Pilih sesuatu yang BENAR-BENAR BERBEDA dan belum pernah direkomendasikan!`
     : '';
   const base = `Kamu teman yang santai & sedikit lucu. Hari ${hari}, jam ${jam}.00 WIB. Preferensi user: ${ctx}. WAJIB ikuti semua preferensi dengan ketat — jika pilih Korea rekomendasikan makanan Korea, jika Vegan harus benar-benar vegan, dst.${historyNote} Variasi wajib berbeda, seed: ${seed}.${rnd}`;
 
@@ -1400,6 +1402,24 @@ async function getFunFact() {
   body.appendChild(card);
 
   // Expanded topics list — lebih bervariasi
+  // Kategori tema untuk variasi fun fact
+  const temaList = [
+    'hewan','manusia & tubuh','Asia','Amerika','Eropa','Afrika','Oseania',
+    'teknologi','sejarah kuno','sejarah modern','kesehatan & medis',
+    'bahasa & linguistik','budaya unik','negara & geografi','makanan & kuliner',
+    'musik','seni & desain','hobi & olahraga','rekor dunia','luar angkasa',
+    'alam & lingkungan','psikologi','ekonomi & uang','hukum aneh',
+    'agama & kepercayaan','penemuan ilmiah','matematika','biologi',
+    'fisika','kimia','arkeologi','mitologi','film & hiburan','sosial media',
+    'transportasi','arsitektur','fashion','olahraga ekstrem','politik sejarah'
+  ];
+
+  // Pilih tema random yang belum dipakai
+  const unusedTema = temaList.filter(t => !ffTopicHistory.includes(t));
+  const temaPool = unusedTema.length > 0 ? unusedTema : temaList;
+  const randomTema = temaPool[Math.floor(Math.random() * temaPool.length)];
+
+  // Pilih sub-topik random dalam tema
   const allTopics = [
     'sains fisika kuantum','sejarah Indonesia kuno','psikologi perilaku manusia',
     'makanan & kuliner dunia','teknologi masa depan','alam & hewan laut',
@@ -1418,8 +1438,8 @@ async function getFunFact() {
   const seed = Math.floor(Math.random() * 9999);
   const histNote = ffHistory.length > 0 ? ` JANGAN ulangi fakta yang sudah pernah: ${ffHistory.slice(-5).join(' | ')}.` : '';
 
-  const prompt = `Berikan 1 fun fact yang BENAR-BENAR mengejutkan dan tidak banyak orang tahu tentang topik: ${topic}.${histNote} Fun fact harus spesifik, ada angka atau data konkret, dan bikin orang bilang "hah beneran?!" Seed: ${seed}. Balas HANYA JSON tanpa backtick:
-{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${topic}","fakta","unik"]}`;
+  const prompt = `Berikan 1 fun fact yang BENAR-BENAR mengejutkan dan tidak banyak orang tahu. Tema wajib: "${randomTema}". Topik spesifik: ${topic}.${histNote} Fun fact harus spesifik, ada angka atau data konkret, dan bikin orang bilang "hah beneran?!" Seed: ${seed}. Balas HANYA JSON tanpa backtick:
+{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${randomTema}","${topic}","fakta"]}`;
 
   try {
     const res = await fetch('/api/recommend', {
@@ -1442,8 +1462,8 @@ async function getFunFact() {
     localStorage.setItem('rnd_ff_history', JSON.stringify(ffHistory));
 
     // Save used topic to persistent history
-    ffTopicHistory.push(topic);
-    if(ffTopicHistory.length > 20) ffTopicHistory.shift();
+    ffTopicHistory.push(randomTema);
+    if(ffTopicHistory.length > 40) ffTopicHistory.shift();
     localStorage.setItem('rnd_ff_topics', JSON.stringify(ffTopicHistory));
     const tagHtml=(parsed.tags||[]).map(t=>`<span class="rtag">${t}</span>`).join('');
     card.innerHTML=`<span class="r-emoji">${parsed.emoji||'💡'}</span><div class="r-cat">FUN FACT RANDOM</div><div class="r-nama">${parsed.nama||'FUN FACT'}</div><div class="r-alasan">${parsed.alasan||''}</div><div class="r-tags">${tagHtml}</div>`;
