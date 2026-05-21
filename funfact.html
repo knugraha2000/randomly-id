@@ -83,12 +83,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 <div class="hero">
   <div class="hero-title">🤯 Fun Fact Random</div>
-  <div class="hero-sub">Tulis kerandoman kamu — atau biarkan kosong buat surprise!</div>
+  <div class="hero-sub">Tulis mood kamu sekarang — AI cari fun fact yang nyambung sama vibesmu!</div>
 </div>
 
 <div class="input-wrap">
-  <div class="input-label">Kerandoman kamu hari ini (opsional)</div>
-  <textarea class="seed-input" id="seed-input" maxlength="150" placeholder="Contoh: lagi makan siang, bosen di kantor, baru bangun tidur, mikirin mantan..." oninput="updateCount()"></textarea>
+  <div class="input-label">Mood / situasi kamu sekarang (opsional)</div>
+  <textarea class="seed-input" id="seed-input" maxlength="150" placeholder="Mood atau situasi kamu sekarang... (contoh: bosen di kantor, lagi makan, mikirin mantan, ga bisa tidur)" oninput="updateCount()"></textarea>
   <div class="char-count"><span id="char-count">0</span>/150</div>
 </div>
 
@@ -156,7 +156,7 @@ async function generateFunFact() {
   // Build prompt
   let prompt;
   if (seedText) {
-    prompt = `User sedang: "${seedText}". Berikan 1 fun fact mengejutkan yang relevan atau terinspirasi dari konteks tersebut. Domain: ${domain}.${histNote} Harus ada angka konkret. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
+    prompt = `Kamu adalah ensiklopedia fakta unik dunia. User sedang dalam mood/situasi: "${seedText}". Gunakan ini hanya sebagai inspirasi vibe atau tema — BUKAN sebagai bahan fakta. Cari fun fact ilmiah/historis/sains yang SUDAH TERBUKTI BENAR dari domain: ${domain}, yang secara vibe atau tema cocok dengan situasi user.${histNote} WAJIB: fakta harus akurat, ada angka konkret dari penelitian nyata, JANGAN ngarang statistik atau sebut brand/layanan yang mungkin tidak ada. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret dari sumber terpercaya, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
   } else {
     prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact mengejutkan tentang domain: ${domain}.${histNote} Harus ada angka konkret, bikin orang bilang "hah beneran?!" Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
   }
