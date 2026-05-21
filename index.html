@@ -2,6 +2,12 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FFD60A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="randomly">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <!-- Google AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2647414280886971" crossorigin="anonymous"></script>
@@ -286,8 +292,8 @@ body {
 .ff-txt { font-size: 11px; color: var(--inkm); line-height: 1.5; font-weight: 400; }
 .city-input { width: 100%; padding: 8px 12px; border: 2px solid var(--border); border-radius: var(--rs); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink); background: var(--w); margin-top: 8px; outline: none; }
 .city-input:focus { border-color: var(--ink); }
-.btn-funfact { width: 100%; padding: 12px; background: #FFF8E7; color: #8A6A00; border: 2px solid var(--ink); border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 var(--ink); }
-.btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-funfact { width: 100%; padding: 12px; background: #FF3B6B; color: white; border: 2px solid #0D0D0D; border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 #0D0D0D; }
+.btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #0D0D0D; }
 /* POSTER */
 /* SPLASH SCREEN */
 #splash-screen {
@@ -595,6 +601,11 @@ body {
     <div class="hero-sub" id="hero-sub">Pilih kategori, jawab 2 hal, langsung dapat rekomendasi.</div>
   </div>
 
+  <!-- FUN FACT BUTTON -->
+  <div style="padding: 12px 20px 12px;">
+    <button class="btn-funfact" onclick="getFunFact()" id="btn-funfact" style="width:100%;"></button>
+  </div>
+
   <!-- CATEGORIES -->
   <div class="cat-wrap">
     <div class="cat-lbl" id="cat-label"></div>
@@ -633,7 +644,6 @@ body {
   <div class="action-wrap">
     <button class="btn-go" onclick="submit(false)" id="btn-rekomendasi"></button>
     <button class="btn-random" onclick="submit(true)" id="btn-gabut"></button>
-    <button class="btn-funfact" onclick="getFunFact()" id="btn-funfact"></button>
   </div>
   <div style="text-align:center;padding:8px 24px 24px;">
     <a href="/privacy.html" style="font-size:11px;color:#9A9A9A;text-decoration:none;font-weight:500;">Privacy Policy</a>
@@ -648,7 +658,7 @@ body {
 <!-- ══════════ RESULT ══════════ -->
 <div id="pg-result">
   <div class="result-header">
-    <button class="btn-back" onclick="ke('home')">←</button>
+    <button class="btn-back" onclick="ke('home')">&larr;</button>
     <div class="result-hdr-title" id="result-hdr-title">randomly.id</div>
   </div>
 
@@ -715,7 +725,14 @@ body {
 let activeTab = 'makan';
 let answers = {};
 let currentRekom = {};
-let rekomenHistory = []; // track last 3 rekomendasi
+// Load rekomendasi history per kategori dari localStorage
+function loadRekomenHistory(tab) {
+  return JSON.parse(localStorage.getItem('rnd_hist_' + tab) || '[]');
+}
+function saveRekomenHistory(tab, history) {
+  localStorage.setItem('rnd_hist_' + tab, JSON.stringify(history));
+}
+let rekomenHistory = loadRekomenHistory('makan');
 let reqCount = 0;
 let skipCount = 0;
 let cooldownUntil = 0;
@@ -829,6 +846,11 @@ function renderQ(tab) {
     const autoVal = (q.auto && tab === 'makan') ? getAutoWaktu() : null;
     if (autoVal) answers[q.key] = autoVal;
 
+    // Set default pilihan pertama jika belum ada jawaban
+    if(!answers[q.key] && !q.hasInput && q.choices && q.choices.length > 0) {
+      answers[q.key] = q.choices[0];
+    }
+
     // City input for jalan
     var cityInput = null;
     if(q.hasInput) {
@@ -864,11 +886,17 @@ function renderQ(tab) {
         if(btn.classList.contains('on')){
           btn.classList.remove('on'); delete answers[q.key];
           if(cityInput) cityInput.style.display = 'none';
+          // Reset history saat filter diubah
+          rekomenHistory = [];
+          saveRekomenHistory(activeTab, []);
           checkReady(); return;
         }
         chips.querySelectorAll('.chip').forEach(b => b.classList.remove('on'));
         btn.classList.add('on');
         answers[q.key] = choice;
+        // Reset history saat filter berubah
+        rekomenHistory = [];
+        saveRekomenHistory(activeTab, []);
         if(cityInput) cityInput.style.display = 'none';
         checkReady();
       };
@@ -901,9 +929,10 @@ function pCat(btn, cat) {
   document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   activeTab = cat;
-  rekomenHistory = []; // reset history saat ganti kategori
+  rekomenHistory = loadRekomenHistory(cat); // load history per kategori
   answers = {};
   renderQ(cat);
+  if(typeof gtag !== 'undefined') gtag('event', 'tab_click', { kategori: cat });
 }
 
 // ── PAYWALL ──
@@ -935,6 +964,9 @@ function resetAll() {
 
 // ── SUBMIT ──
 function submit(isSurprise) {
+  if(typeof gtag !== 'undefined') gtag('event', 'rekomendasi_request', {
+    kategori: activeTab, mode: isSurprise ? 'gabut' : 'normal'
+  });
   checkPaywall();
 
   if (cooldownUntil > 0 && Date.now() < cooldownUntil) {
@@ -1016,6 +1048,10 @@ async function getAI(isSurprise) {
     if(j1 > -1 && j2 > -1) clean = clean.substring(j1, j2+1);
     const parsed = JSON.parse(clean);
 
+    if(typeof gtag !== 'undefined') gtag('event', 'rekomendasi_success', {
+      kategori: activeTab,
+      nama: parsed.nama || ''
+    });
     currentRekom = {
       emoji: parsed.emoji || '🎯',
       nama: parsed.nama || '—',
@@ -1034,10 +1070,12 @@ async function getAI(isSurprise) {
       tags: parsed.tags || []
     };
     // Simpan ke history, max 5
-    const histKey = (parsed.nama || '') + (parsed.alasan ? ' — ' + (parsed.alasan || '').substring(0,40) : '');
-    rekomenHistory.push(histKey);
-    if(rekomenHistory.length > 5) rekomenHistory.shift();
-    if(rekomenHistory.length > 5) rekomenHistory.shift();
+    const histKey = (parsed.nama || '').toUpperCase().trim();
+    if(histKey && !rekomenHistory.includes(histKey)) {
+      rekomenHistory.push(histKey);
+    }
+    if(rekomenHistory.length > 15) rekomenHistory.shift();
+    saveRekomenHistory(activeTab, rekomenHistory);
 
     if(activeTab === 'masak') {
       renderMasakResult(body, parsed);
@@ -1048,8 +1086,10 @@ async function getAI(isSurprise) {
 
   } catch(e) {
     clearInterval(lt);
+    console.error('randomly.id error:', e.message, e);
     const card = document.getElementById('result-card');
-    if (card) card.innerHTML = `<span style="font-size:32px">😅</span><div style="font-size:14px;color:#4A4A4A;margin-top:10px;font-weight:500">Aduh, lagi error nih!<br><span style="font-size:12px;color:#9A9A9A">API key belum dipasang atau ada masalah koneksi.</span></div>`;
+    const errMsg = e.message || 'Unknown error';
+    if (card) card.innerHTML = `<span style="font-size:32px">😅</span><div style="font-size:14px;color:#4A4A4A;margin-top:10px;font-weight:500">Aduh, lagi error nih!<br><span style="font-size:12px;color:#9A9A9A">Coba lagi ya! (${errMsg})</span></div>`;
     addActions(body);
   }
 }
@@ -1222,7 +1262,7 @@ function buildPrompt(isSurprise) {
   const fmt = '\nBalas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(HURUF KAPITAL maks 4 kata)","alasan":"(1-2 kalimat santai, relatable, sedikit lucu — dalam tanda kutip)","fun_fact":"(1 fun fact menarik dan singkat, maks 2 kalimat)","tags":["tag1","tag2","tag3"]}';
   const seed = Math.floor(Math.random() * 1000);
   const historyNote = rekomenHistory.length > 0
-    ? ` DILARANG KERAS mengulang atau mirip dengan rekomendasi sebelumnya: ${rekomenHistory.join(', ')}. Harus benar-benar berbeda!`
+    ? ` PENTING: DILARANG KERAS merekomendasikan item berikut yang sudah pernah muncul sebelumnya: [${rekomenHistory.join(' | ')}]. Pilih sesuatu yang BENAR-BENAR BERBEDA dan belum pernah direkomendasikan!`
     : '';
   const base = `Kamu teman yang santai & sedikit lucu. Hari ${hari}, jam ${jam}.00 WIB. Preferensi user: ${ctx}. WAJIB ikuti semua preferensi dengan ketat — jika pilih Korea rekomendasikan makanan Korea, jika Vegan harus benar-benar vegan, dst.${historyNote} Variasi wajib berbeda, seed: ${seed}.${rnd}`;
 
@@ -1279,7 +1319,10 @@ function getShareText() {
 
   return label + '\n\n' + currentRekom.emoji + ' ' + currentRekom.nama + '\n\n' + currentRekom.alasan + ff + footer;
 }
-function shareWA() { window.open('https://wa.me/?text=' + encodeURIComponent(getShareText()), '_blank'); }
+function shareWA() {
+  if(typeof gtag !== 'undefined') gtag('event', 'share_wa', { kategori: activeTab });
+  window.open('https://wa.me/?text=' + encodeURIComponent(getShareText()), '_blank');
+}
 function closeModal() { document.getElementById('ig-modal').classList.remove('show'); }
 function copyFromModal() {
   navigator.clipboard.writeText(getShareText()).then(() => {
@@ -1287,7 +1330,10 @@ function copyFromModal() {
     closeModal();
   });
 }
-function copyTeks() { navigator.clipboard.writeText(getShareText()).then(() => showToast('✓ Teks disalin!')); }
+function copyTeks() {
+  if(typeof gtag !== 'undefined') gtag('event', 'copy_teks', { kategori: activeTab });
+  navigator.clipboard.writeText(getShareText()).then(() => showToast('✓ Teks disalin!'));
+}
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -1340,9 +1386,12 @@ async function fetchPoster(filmTitle, card) {
 
 // ── FUN FACT ──
 // Fun Fact history — track untuk anti-repeat
-var ffHistory = [];
+// Load fun fact history from localStorage — persistent antar sesi
+var ffHistory = JSON.parse(localStorage.getItem('rnd_ff_history') || '[]');
+var ffTopicHistory = JSON.parse(localStorage.getItem('rnd_ff_topics') || '[]');
 
 async function getFunFact() {
+  if(typeof gtag !== 'undefined') gtag('event', 'fun_fact_click', {});
   activeTab = 'funfact';
   ke('result');
   const body = document.getElementById('result-body');
@@ -1355,26 +1404,17 @@ async function getFunFact() {
   body.appendChild(card);
 
   // Expanded topics list — lebih bervariasi
-  const allTopics = [
-    'sains fisika kuantum','sejarah Indonesia kuno','psikologi perilaku manusia',
-    'makanan & kuliner dunia','teknologi masa depan','alam & hewan laut',
-    'tubuh manusia','budaya unik dunia','astronomi & luar angkasa',
-    'sejarah perang dunia','biologi evolusi','geografi & bumi',
-    'matematika & angka unik','musik & seni','olahraga & rekor dunia',
-    'ekonomi & uang','bahasa & linguistik','arkeologi & penemuan kuno',
-    'medis & kesehatan unik','hukum aneh di dunia'
-  ];
+  const seed = Math.floor(Math.random() * 999999);
+  const histNote = ffHistory.length > 0
+    ? ` Jangan ulangi: ${ffHistory.slice(-5).join(', ')}.`
+    : '';
 
-  // Pilih topik yang belum pernah dipakai
-  const unusedTopics = allTopics.filter(t => !ffHistory.includes(t));
-  const topicPool = unusedTopics.length > 0 ? unusedTopics : allTopics;
-  const topic = topicPool[Math.floor(Math.random() * topicPool.length)];
+  // Pilih domain random supaya tidak bias ke hewan
+  const domains = ['sejarah manusia','teknologi & sains','negara & geografi','bahasa & budaya','makanan & kuliner','musik & seni','olahraga & rekor','tubuh manusia','luar angkasa','ekonomi & uang','hukum & politik','arkeologi','psikologi','matematika','transportasi'];
+  const domain = domains[Math.floor(Math.random() * domains.length)];
 
-  const seed = Math.floor(Math.random() * 9999);
-  const histNote = ffHistory.length > 0 ? ` JANGAN ulangi fakta yang sudah pernah: ${ffHistory.slice(-5).join(' | ')}.` : '';
-
-  const prompt = `Berikan 1 fun fact yang BENAR-BENAR mengejutkan dan tidak banyak orang tahu tentang topik: ${topic}.${histNote} Fun fact harus spesifik, ada angka atau data konkret, dan bikin orang bilang "hah beneran?!" Seed: ${seed}. Balas HANYA JSON tanpa backtick:
-{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${topic}","fakta","unik"]}`;
+  const prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact yang benar-benar mengejutkan tentang domain: ${domain}.${histNote} Fun fact harus spesifik dengan angka atau data konkret, dan bikin orang bilang "hah beneran?!" JANGAN tentang hewan kecuali domain-nya memang hewan. Seed: ${seed}. Balas HANYA JSON tanpa backtick:
+{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${domain}","fakta","unik"]}`;
 
   try {
     const res = await fetch('/api/recommend', {
@@ -1390,10 +1430,18 @@ async function getFunFact() {
 
     currentRekom={emoji:parsed.emoji||'💡',nama:parsed.nama||'FUN FACT',alasan:parsed.alasan||'',fun_fact:'',tags:parsed.tags||[]};
     // Save to history
-    ffHistory.push((parsed.nama||'') + ' — ' + (parsed.alasan||'').substring(0,40));
-    if(ffHistory.length > 10) ffHistory.shift();
-    // Save used topic
-    if(!ffHistory.includes(topic)) ffHistory.push(topic);
+    // Save fun fact to persistent history — judul pendek saja
+    const ffWords = (parsed.nama||'').toUpperCase().trim().split(' ').slice(0,3).join(' ');
+    if(ffWords && !ffHistory.includes(ffWords)) {
+      ffHistory.push(ffWords);
+    }
+    if(ffHistory.length > 30) ffHistory.shift();
+    localStorage.setItem('rnd_ff_history', JSON.stringify(ffHistory));
+
+    // Save used topic to persistent history
+    // Topic history - simpan nama fakta saja
+    if(ffTopicHistory.length > 40) ffTopicHistory.shift();
+    localStorage.setItem('rnd_ff_topics', JSON.stringify(ffTopicHistory));
     const tagHtml=(parsed.tags||[]).map(t=>`<span class="rtag">${t}</span>`).join('');
     card.innerHTML=`<span class="r-emoji">${parsed.emoji||'💡'}</span><div class="r-cat">FUN FACT RANDOM</div><div class="r-nama">${parsed.nama||'FUN FACT'}</div><div class="r-alasan">${parsed.alasan||''}</div><div class="r-tags">${tagHtml}</div>`;
 
@@ -1408,7 +1456,8 @@ async function getFunFact() {
     body.appendChild(wrap);
 
   } catch(e) {
-    card.innerHTML='<span style="font-size:30px">😅</span><div style="font-size:13px;margin-top:10px">Aduh error nih, coba lagi!</div>';
+    console.error('Fun fact error:', e.message, e);
+    card.innerHTML=`<span style="font-size:30px">😅</span><div style="font-size:13px;margin-top:10px">Aduh error nih, coba lagi!<br><span style="font-size:11px;color:#888">${e.message||''}</span></div>`;
   }
 }
 
@@ -1431,6 +1480,7 @@ function renderMasakResult(body, parsed) {
 
 // ── SUBMIT GANTI ──
 function submitGanti() {
+  if(typeof gtag !== 'undefined') gtag('event', 'ganti_rekomendasi', { kategori: activeTab });
   // Force different by temporarily adding random hint to answers
   const oldHint = answers._hint;
   answers._hint = 'coba yang berbeda, jangan ulangi yang sama, variasi ' + Math.random();
@@ -1464,7 +1514,7 @@ function initSplash() {
     return;
   }
   // Auto dismiss setelah 2.5 detik
-  setTimeout(dismissSplash, 10000);
+  setTimeout(dismissSplash, 5000);
   // Tap anywhere to dismiss
   document.getElementById('splash-screen').addEventListener('click', dismissSplash);
 }
@@ -1645,6 +1695,15 @@ function showSoftPaywall(){
 }
 
 
+</script>
+<script>
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(reg) { console.log('SW registered'); })
+      .catch(function(err) { console.log('SW error:', err); });
+  });
+}
 </script>
 </body>
 </html>
