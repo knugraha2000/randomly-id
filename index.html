@@ -1409,8 +1409,12 @@ async function getFunFact() {
     ? ` Jangan ulangi: ${ffHistory.slice(-5).join(', ')}.`
     : '';
 
-  const prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact yang benar-benar mengejutkan dan tidak banyak orang tahu. Pilih sendiri topiknya dari mana saja — hewan, manusia, sejarah, teknologi, negara, bahasa, makanan, musik, olahraga, sains, budaya, rekor, atau topik lain yang kamu anggap paling mengejutkan.${histNote} Fun fact harus spesifik dengan angka atau data konkret. Seed variasi: ${seed}. Balas HANYA JSON tanpa backtick:
-{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
+  // Pilih domain random supaya tidak bias ke hewan
+  const domains = ['sejarah manusia','teknologi & sains','negara & geografi','bahasa & budaya','makanan & kuliner','musik & seni','olahraga & rekor','tubuh manusia','luar angkasa','ekonomi & uang','hukum & politik','arkeologi','psikologi','matematika','transportasi'];
+  const domain = domains[Math.floor(Math.random() * domains.length)];
+
+  const prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact yang benar-benar mengejutkan tentang domain: ${domain}.${histNote} Fun fact harus spesifik dengan angka atau data konkret, dan bikin orang bilang "hah beneran?!" JANGAN tentang hewan kecuali domain-nya memang hewan. Seed: ${seed}. Balas HANYA JSON tanpa backtick:
+{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${domain}","fakta","unik"]}`;
 
   try {
     const res = await fetch('/api/recommend', {
