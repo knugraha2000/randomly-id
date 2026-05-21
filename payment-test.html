@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test QRIS — randomly.id</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FFFEF5; color: #0D0D0D; padding: 24px; max-width: 420px; margin: 0 auto; }
+h1 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.sub { font-size: 13px; color: #888; margin-bottom: 24px; }
+.card { background: white; border: 2px solid #0D0D0D; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 4px 4px 0 #0D0D0D; }
+.amount { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+.amount-sub { font-size: 12px; color: #888; text-align: center; margin-bottom: 20px; }
+#qr-wrap { display: flex; align-items: center; justify-content: center; min-height: 200px; }
+#qr-wrap canvas, #qr-wrap img { border-radius: 8px; }
+.status { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 16px; }
+.status.loading { background: #FFF8E7; color: #8A6A00; }
+.status.waiting { background: #E8F4FF; color: #1A6BBF; }
+.status.success { background: #E8F8E8; color: #1A7A1A; }
+.status.error { background: #FFE8E8; color: #CC0000; }
+.btn { width: 100%; padding: 14px; background: #0D0D0D; color: #FFD60A; border: none; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: white; color: #0D0D0D; border: 2px solid #0D0D0D; }
+.refnum { font-size: 11px; color: #888; text-align: center; margin-top: 8px; font-family: monospace; }
+.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #FFD60A; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.log { background: #1a1a1a; color: #00ff00; padding: 12px; border-radius: 8px; font-size: 11px; font-family: monospace; margin-top: 16px; max-height: 150px; overflow-y: auto; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<h1>🧪 Test QRIS randomly.id</h1>
+<p class="sub">Halaman simulasi pembayaran QRIS dinamis</p>
+
+<div class="card">
+  <div class="amount">Rp 5.000</div>
+  <div class="amount-sub">Unlock rekomendasi 24 jam</div>
+  <div id="qr-wrap">
+    <div style="text-align:center;color:#888;font-size:13px;">Klik tombol untuk generate QR</div>
+  </div>
+  <div id="status" class="status" style="display:none;"></div>
+  <div id="refnum" class="refnum"></div>
+  <button class="btn" id="btn-generate" onclick="generateQR()">🎲 Generate QRIS</button>
+  <button class="btn btn-secondary" id="btn-check" onclick="checkStatus()" style="display:none;">🔍 Cek Status Pembayaran</button>
+</div>
+
+<div id="log" class="log" style="display:none;"></div>
+
+<script>
+let currentRefnum = null;
+let currentPartnerRef = null;
+let currentCustId = null;
+let adviceInterval = null;
+
+function getDeviceId() {
+  let id = localStorage.getItem('rnd_device_id');
+  if(!id) {
+    id = 'rnd' + Date.now() + Math.random().toString(36).substr(2,6);
+    localStorage.setItem('rnd_device_id', id);
+  }
+  return id;
+}
+
+function log(msg) {
+  const el = document.getElementById('log');
+  el.style.display = 'block';
+  el.textContent += new Date().toLocaleTimeString() + ' — ' + msg + '\n';
+  el.scrollTop = el.scrollHeight;
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('status');
+  el.style.display = 'block';
+  el.className = 'status ' + type;
+  el.innerHTML = msg;
+}
+
+async function generateQR() {
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+  setStatus('loading', 'Menghubungi payment gateway...');
+  document.getElementById('qr-wrap').innerHTML = '<div style="text-align:center;color:#888;font-size:13px;">Generating QR...</div>';
+
+  currentCustId = getDeviceId();
+  log('Device ID: ' + currentCustId);
+
+  try {
+    const res = await fetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'inquiry',
+        amount: '5000',
+        cust_id: currentCustId
+      })
+    });
+    const data = await res.json();
+    log('Inquiry response: ' + JSON.stringify(data));
+
+    if (data.success && data.qr_content) {
+      currentRefnum = data.refnum;
+      currentPartnerRef = data.partner_ref;
+      document.getElementById('refnum').textContent = 'Ref: ' + currentRefnum;
+
+      // Render QR
+      document.getElementById('qr-wrap').innerHTML = '<div id="qrcode"></div>';
+      new QRCode(document.getElementById('qrcode'), {
+        text: data.qr_content,
+        width: 220,
+        height: 220,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      setStatus('waiting', '⏳ Scan QR di atas dengan aplikasi e-wallet kamu');
+      btn.innerHTML = '🔄 Generate Ulang';
+      btn.disabled = false;
+      document.getElementById('btn-check').style.display = 'block';
+
+      // Auto advice setiap 10 detik
+      if(adviceInterval) clearInterval(adviceInterval);
+      adviceInterval = setInterval(checkStatus, 10000);
+      log('Auto-check dimulai setiap 10 detik...');
+
+    } else {
+      setStatus('error', '❌ Gagal: ' + (data.error || 'Unknown error'));
+      btn.innerHTML = '🎲 Generate QRIS';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    log('Error: ' + e.message);
+    setStatus('error', '❌ Error: ' + e.message);
+    btn.innerHTML = '🎲 Generate QRIS';
+    btn.disabled = false;
+  }
+}
+
+async function checkStatus() {
+  if(!currentRefnum) return;
+  log('Checking advice...');
+
+  try {
+    const res = await fetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'advice',
+        amount: '5000',
+        cust_id: currentCustId,
+        refnum: currentRefnum,
+        partner_ref: currentPartnerRef
+      })
+    });
+    const data = await res.json();
+    log('Advice response: ' + JSON.stringify(data));
+
+    if (data.paid) {
+      clearInterval(adviceInterval);
+      setStatus('success', '✅ Pembayaran berhasil! Unlock 24 jam aktif.<br><small>Paid: ' + data.paid_time + '</small>');
+      document.getElementById('btn-check').style.display = 'none';
+      document.getElementById('btn-generate').style.display = 'none';
+      document.getElementById('qr-wrap').innerHTML = '<div style="font-size:48px;text-align:center;">🎉</div>';
+      log('PAID! issuerId: ' + data.issuer_id);
+    }
+  } catch(e) {
+    log('Advice error: ' + e.message);
+  }
+}
+</script>
+</body>
+</html>
