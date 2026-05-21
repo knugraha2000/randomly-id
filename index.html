@@ -292,8 +292,8 @@ body {
 .ff-txt { font-size: 11px; color: var(--inkm); line-height: 1.5; font-weight: 400; }
 .city-input { width: 100%; padding: 8px 12px; border: 2px solid var(--border); border-radius: var(--rs); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink); background: var(--w); margin-top: 8px; outline: none; }
 .city-input:focus { border-color: var(--ink); }
-.btn-funfact { width: 100%; padding: 12px; background: #FFF8E7; color: #8A6A00; border: 2px solid var(--ink); border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 var(--ink); }
-.btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-funfact { width: 100%; padding: 12px; background: #FF3B6B; color: white; border: 2px solid #0D0D0D; border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 #0D0D0D; }
+.btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #0D0D0D; }
 /* POSTER */
 /* SPLASH SCREEN */
 #splash-screen {
@@ -601,6 +601,11 @@ body {
     <div class="hero-sub" id="hero-sub">Pilih kategori, jawab 2 hal, langsung dapat rekomendasi.</div>
   </div>
 
+  <!-- FUN FACT BUTTON -->
+  <div style="padding: 0 20px 12px;">
+    <button class="btn-funfact" onclick="getFunFact()" id="btn-funfact" style="width:100%;"></button>
+  </div>
+
   <!-- CATEGORIES -->
   <div class="cat-wrap">
     <div class="cat-lbl" id="cat-label"></div>
@@ -639,7 +644,6 @@ body {
   <div class="action-wrap">
     <button class="btn-go" onclick="submit(false)" id="btn-rekomendasi"></button>
     <button class="btn-random" onclick="submit(true)" id="btn-gabut"></button>
-    <button class="btn-funfact" onclick="getFunFact()" id="btn-funfact"></button>
   </div>
   <div style="text-align:center;padding:8px 24px 24px;">
     <a href="/privacy.html" style="font-size:11px;color:#9A9A9A;text-decoration:none;font-weight:500;">Privacy Policy</a>
