@@ -127,11 +127,15 @@ function getShareText(nama, alasan, seedText) {
   return `🤯 FUN FACT RANDOM\n\n${nama}\n\n${alasan}${seedNote}\n\nrandomly.id — lagi random? randomly aja.`;
 }
 
-async function generateFunFact() {
-  const seedText = document.getElementById('seed-input').value.trim();
+async function generateFunFact(keepSeed) {
+  const input = document.getElementById('seed-input');
+  const seedText = input ? input.value.trim() : (window._lastSeed || '');
+  window._lastSeed = seedText; // simpan seed terakhir
   const btn = document.getElementById('btn-generate');
   btn.disabled = true;
   btn.textContent = 'Lagi korek-korek fakta unik...';
+  // Pastikan textarea tetap ada isinya
+  if(input && seedText) { input.value = seedText; updateCount(); }
 
   // Show loading
   document.getElementById('result-wrap').innerHTML = `
