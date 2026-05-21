@@ -1086,8 +1086,10 @@ async function getAI(isSurprise) {
 
   } catch(e) {
     clearInterval(lt);
+    console.error('randomly.id error:', e.message, e);
     const card = document.getElementById('result-card');
-    if (card) card.innerHTML = `<span style="font-size:32px">😅</span><div style="font-size:14px;color:#4A4A4A;margin-top:10px;font-weight:500">Aduh, lagi error nih!<br><span style="font-size:12px;color:#9A9A9A">API key belum dipasang atau ada masalah koneksi.</span></div>`;
+    const errMsg = e.message || 'Unknown error';
+    if (card) card.innerHTML = `<span style="font-size:32px">😅</span><div style="font-size:14px;color:#4A4A4A;margin-top:10px;font-weight:500">Aduh, lagi error nih!<br><span style="font-size:12px;color:#9A9A9A">Coba lagi ya! (${errMsg})</span></div>`;
     addActions(body);
   }
 }
@@ -1404,7 +1406,7 @@ async function getFunFact() {
   // Expanded topics list — lebih bervariasi
   const seed = Math.floor(Math.random() * 999999);
   const histNote = ffHistory.length > 0
-    ? ` Fakta-fakta berikut SUDAH PERNAH DIBERIKAN, JANGAN diulang: [${ffHistory.slice(-15).join(' | ')}].`
+    ? ` Jangan ulangi: ${ffHistory.slice(-5).join(', ')}.`
     : '';
 
   const prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact yang benar-benar mengejutkan dan tidak banyak orang tahu. Pilih sendiri topiknya dari mana saja — hewan, manusia, sejarah, teknologi, negara, bahasa, makanan, musik, olahraga, sains, budaya, rekor, atau topik lain yang kamu anggap paling mengejutkan.${histNote} Fun fact harus spesifik dengan angka atau data konkret. Seed variasi: ${seed}. Balas HANYA JSON tanpa backtick:
@@ -1450,7 +1452,8 @@ async function getFunFact() {
     body.appendChild(wrap);
 
   } catch(e) {
-    card.innerHTML='<span style="font-size:30px">😅</span><div style="font-size:13px;margin-top:10px">Aduh error nih, coba lagi!</div>';
+    console.error('Fun fact error:', e.message, e);
+    card.innerHTML=`<span style="font-size:30px">😅</span><div style="font-size:13px;margin-top:10px">Aduh error nih, coba lagi!<br><span style="font-size:11px;color:#888">${e.message||''}</span></div>`;
   }
 }
 
