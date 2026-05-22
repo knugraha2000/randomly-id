@@ -6,44 +6,80 @@
 <title>Test QRIS — randomly.id</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FFFEF5; color: #0D0D0D; padding: 24px; max-width: 420px; margin: 0 auto; }
-h1 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
-.sub { font-size: 13px; color: #888; margin-bottom: 24px; }
-.card { background: white; border: 2px solid #0D0D0D; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 4px 4px 0 #0D0D0D; }
-.amount { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 4px; }
-.amount-sub { font-size: 12px; color: #888; text-align: center; margin-bottom: 20px; }
-#qr-wrap { display: flex; align-items: center; justify-content: center; min-height: 200px; }
-#qr-wrap canvas, #qr-wrap img { border-radius: 8px; }
-.status { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 16px; }
-.status.loading { background: #FFF8E7; color: #8A6A00; }
-.status.waiting { background: #E8F4FF; color: #1A6BBF; }
-.status.success { background: #E8F8E8; color: #1A7A1A; }
-.status.error { background: #FFE8E8; color: #CC0000; }
-.btn { width: 100%; padding: 14px; background: #0D0D0D; color: #FFD60A; border: none; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-secondary { background: white; color: #0D0D0D; border: 2px solid #0D0D0D; }
-.refnum { font-size: 11px; color: #888; text-align: center; margin-top: 8px; font-family: monospace; }
-.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #FFD60A; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.log { background: #1a1a1a; color: #00ff00; padding: 12px; border-radius: 8px; font-size: 11px; font-family: monospace; margin-top: 16px; max-height: 150px; overflow-y: auto; white-space: pre-wrap; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#FFFEF5;color:#0D0D0D;padding:24px;max-width:420px;margin:0 auto;}
+h1{font-size:20px;font-weight:800;margin-bottom:4px;}
+.sub{font-size:13px;color:#888;margin-bottom:24px;}
+.card{background:white;border:2px solid #0D0D0D;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:4px 4px 0 #0D0D0D;}
+
+/* Amount input */
+.amount-label{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.amount-wrap{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+.currency{font-size:20px;font-weight:800;}
+.amount-input{flex:1;padding:10px 14px;border:2px solid #0D0D0D;border-radius:12px;font-size:20px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;text-align:right;}
+.amount-input:focus{outline:none;border-color:#FF3B6B;}
+.amount-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.preset{padding:6px 12px;border:1.5px solid #0D0D0D;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:white;}
+.preset.active{background:#0D0D0D;color:#FFD60A;}
+.preset:hover{background:#F5F5F5;}
+
+.amount-display{font-size:28px;font-weight:800;text-align:center;margin-bottom:4px;}
+.amount-sub{font-size:12px;color:#888;text-align:center;margin-bottom:20px;}
+#qr-wrap{display:flex;align-items:center;justify-content:center;min-height:200px;}
+.status{text-align:center;padding:12px;border-radius:8px;font-size:14px;font-weight:600;margin-top:16px;}
+.status.loading{background:#FFF8E7;color:#8A6A00;}
+.status.waiting{background:#E8F4FF;color:#1A6BBF;}
+.status.success{background:#E8F8E8;color:#1A7A1A;}
+.status.error{background:#FFE8E8;color:#CC0000;}
+
+/* Transaction detail */
+.txn-detail{background:#F8F8F8;border-radius:10px;padding:12px;margin-top:12px;font-size:12px;}
+.txn-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #EEE;}
+.txn-row:last-child{border-bottom:none;font-weight:700;font-size:13px;}
+.txn-label{color:#888;}
+.txn-value{font-weight:600;color:#0D0D0D;}
+
+.btn{width:100%;padding:14px;background:#0D0D0D;color:#FFD60A;border:none;border-radius:50px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-secondary{background:white;color:#0D0D0D;border:2px solid #0D0D0D;}
+.btn-reset{background:#FF3B6B;color:white;border:none;}
+.refnum{font-size:11px;color:#888;text-align:center;margin-top:8px;font-family:monospace;}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid #FFD60A;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.log{background:#1a1a1a;color:#00ff00;padding:12px;border-radius:8px;font-size:11px;font-family:monospace;margin-top:16px;max-height:200px;overflow-y:auto;white-space:pre-wrap;}
+.divider{border:none;border-top:1px solid #EEE;margin:16px 0;}
 </style>
 </head>
 <body>
 
 <h1>🧪 Test QRIS randomly.id</h1>
-<p class="sub">Halaman simulasi pembayaran QRIS dinamis</p>
+<p class="sub">Simulasi pembayaran QRIS dinamis dengan nominal custom</p>
 
 <div class="card">
-  <div class="amount">Rp 5.000</div>
-  <div class="amount-sub">Unlock rekomendasi 24 jam</div>
+  <div class="amount-label">Nominal pembayaran</div>
+  <div class="amount-wrap">
+    <span class="currency">Rp</span>
+    <input class="amount-input" id="amount-input" type="number" value="10000" min="1000" max="1000000" step="1000" oninput="updateDisplay()">
+  </div>
+  <div class="amount-presets">
+    <button class="preset" onclick="setAmount(5000)">Rp 5.000</button>
+    <button class="preset active" onclick="setAmount(10000)">Rp 10.000</button>
+    <button class="preset" onclick="setAmount(15000)">Rp 15.000</button>
+    <button class="preset" onclick="setAmount(25000)">Rp 25.000</button>
+    <button class="preset" onclick="setAmount(50000)">Rp 50.000</button>
+  </div>
+  <hr class="divider">
+  <div class="amount-display" id="amount-display">Rp 10.000</div>
+  <div class="amount-sub">Nominal yang akan di-charge ke user</div>
   <div id="qr-wrap">
-    <div style="text-align:center;color:#888;font-size:13px;">Klik tombol untuk generate QR</div>
+    <div style="text-align:center;color:#888;font-size:13px;">Set nominal → klik Generate</div>
   </div>
   <div id="status" class="status" style="display:none;"></div>
+  <div id="txn-detail" style="display:none;"></div>
   <div id="refnum" class="refnum"></div>
   <button class="btn" id="btn-generate" onclick="generateQR()">🎲 Generate QRIS</button>
-  <button class="btn btn-secondary" id="btn-check" onclick="checkStatus()" style="display:none;">🔍 Cek Status Pembayaran</button>
+  <button class="btn btn-secondary" id="btn-check" onclick="checkStatus()" style="display:none;">🔍 Cek Status Manual</button>
+  <button class="btn btn-reset" id="btn-reset" onclick="resetForm()" style="display:none;">🔄 Reset & Test Lagi</button>
 </div>
 
 <div id="log" class="log" style="display:none;"></div>
@@ -52,6 +88,7 @@ h1 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
 let currentRefnum = null;
 let currentPartnerRef = null;
 let currentCustId = null;
+let currentAmount = '10000';
 let adviceInterval = null;
 
 function getDeviceId() {
@@ -61,6 +98,23 @@ function getDeviceId() {
     localStorage.setItem('rnd_device_id', id);
   }
   return id;
+}
+
+function formatRupiah(num) {
+  return 'Rp ' + parseInt(num).toLocaleString('id-ID');
+}
+
+function setAmount(val) {
+  document.getElementById('amount-input').value = val;
+  document.querySelectorAll('.preset').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateDisplay();
+}
+
+function updateDisplay() {
+  const val = document.getElementById('amount-input').value || '0';
+  document.getElementById('amount-display').textContent = formatRupiah(val);
+  document.querySelectorAll('.preset').forEach(b => b.classList.remove('active'));
 }
 
 function log(msg) {
@@ -77,63 +131,106 @@ function setStatus(type, msg) {
   el.innerHTML = msg;
 }
 
+function showTxnDetail(data) {
+  const gross = parseInt(currentAmount);
+  const nett = data.nett_amount ? parseInt(data.nett_amount) : null;
+  const fee = nett ? gross - nett : null;
+  const issuer = data.issuer_id || '-';
+  const paidTime = data.paid_time ? new Date(data.paid_time).toLocaleString('id-ID') : '-';
+
+  document.getElementById('txn-detail').style.display = 'block';
+  document.getElementById('txn-detail').innerHTML = `
+    <div class="txn-detail">
+      <div class="txn-row"><span class="txn-label">Nominal dibayar</span><span class="txn-value">${formatRupiah(gross)}</span></div>
+      ${nett ? `<div class="txn-row"><span class="txn-label">Fee</span><span class="txn-value">- ${formatRupiah(fee)}</span></div>` : ''}
+      ${nett ? `<div class="txn-row"><span class="txn-label">Nett diterima</span><span class="txn-value">${formatRupiah(nett)}</span></div>` : ''}
+      <div class="txn-row"><span class="txn-label">Issuer ID</span><span class="txn-value">${issuer}</span></div>
+      <div class="txn-row"><span class="txn-label">Waktu bayar</span><span class="txn-value">${paidTime}</span></div>
+      <div class="txn-row"><span class="txn-label">Ref number</span><span class="txn-value">${currentRefnum}</span></div>
+    </div>`;
+}
+
+function resetForm() {
+  if(adviceInterval) clearInterval(adviceInterval);
+  currentRefnum = null;
+  currentPartnerRef = null;
+  document.getElementById('qr-wrap').innerHTML = '<div style="text-align:center;color:#888;font-size:13px;">Set nominal → klik Generate</div>';
+  document.getElementById('status').style.display = 'none';
+  document.getElementById('txn-detail').style.display = 'none';
+  document.getElementById('refnum').textContent = '';
+  document.getElementById('btn-check').style.display = 'none';
+  document.getElementById('btn-reset').style.display = 'none';
+  document.getElementById('btn-generate').style.display = 'block';
+  document.getElementById('amount-input').disabled = false;
+  document.querySelectorAll('.preset').forEach(b => b.disabled = false);
+}
+
 async function generateQR() {
+  const amountVal = document.getElementById('amount-input').value;
+  if(!amountVal || parseInt(amountVal) < 1000) {
+    alert('Minimal Rp 1.000');
+    return;
+  }
+
+  currentAmount = amountVal;
+  currentCustId = getDeviceId();
+
   const btn = document.getElementById('btn-generate');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Generating...';
+  document.getElementById('amount-input').disabled = true;
+  document.querySelectorAll('.preset').forEach(b => b.disabled = true);
   setStatus('loading', 'Menghubungi payment gateway...');
   document.getElementById('qr-wrap').innerHTML = '<div style="text-align:center;color:#888;font-size:13px;">Generating QR...</div>';
 
-  currentCustId = getDeviceId();
+  log('Amount: Rp ' + parseInt(currentAmount).toLocaleString('id-ID'));
   log('Device ID: ' + currentCustId);
 
   try {
     const res = await fetch('/api/payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'inquiry',
-        amount: '5000',
-        cust_id: currentCustId
-      })
+      body: JSON.stringify({ action: 'inquiry', amount: currentAmount, cust_id: currentCustId })
     });
     const data = await res.json();
-    log('Inquiry response: ' + JSON.stringify(data));
+    log('Inquiry: ' + JSON.stringify(data));
 
-    if (data.success && data.qr_content) {
+    if(data.success && data.qr_content) {
       currentRefnum = data.refnum;
       currentPartnerRef = data.partner_ref;
       document.getElementById('refnum').textContent = 'Ref: ' + currentRefnum;
 
-      // Render QR
       document.getElementById('qr-wrap').innerHTML = '<div id="qrcode"></div>';
       new QRCode(document.getElementById('qrcode'), {
         text: data.qr_content,
-        width: 220,
-        height: 220,
+        width: 220, height: 220,
         correctLevel: QRCode.CorrectLevel.M
       });
 
-      setStatus('waiting', '⏳ Scan QR di atas dengan aplikasi e-wallet kamu');
-      btn.innerHTML = '🔄 Generate Ulang';
-      btn.disabled = false;
+      setStatus('waiting', `⏳ Scan QR — bayar ${formatRupiah(currentAmount)}`);
+      btn.innerHTML = '✅ QR Generated';
+      btn.style.display = 'none';
       document.getElementById('btn-check').style.display = 'block';
+      document.getElementById('btn-reset').style.display = 'block';
 
-      // Auto advice setiap 10 detik
       if(adviceInterval) clearInterval(adviceInterval);
       adviceInterval = setInterval(checkStatus, 10000);
-      log('Auto-check dimulai setiap 10 detik...');
+      log('Auto-check setiap 10 detik...');
 
     } else {
-      setStatus('error', '❌ Gagal: ' + (data.error || 'Unknown error'));
+      setStatus('error', '❌ Gagal: ' + (data.error || 'Unknown'));
       btn.innerHTML = '🎲 Generate QRIS';
       btn.disabled = false;
+      document.getElementById('amount-input').disabled = false;
+      document.querySelectorAll('.preset').forEach(b => b.disabled = false);
     }
   } catch(e) {
     log('Error: ' + e.message);
     setStatus('error', '❌ Error: ' + e.message);
     btn.innerHTML = '🎲 Generate QRIS';
     btn.disabled = false;
+    document.getElementById('amount-input').disabled = false;
+    document.querySelectorAll('.preset').forEach(b => b.disabled = false);
   }
 }
 
@@ -146,23 +243,20 @@ async function checkStatus() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'advice',
-        amount: '5000',
-        cust_id: currentCustId,
-        refnum: currentRefnum,
-        partner_ref: currentPartnerRef
+        action: 'advice', amount: currentAmount,
+        cust_id: currentCustId, refnum: currentRefnum, partner_ref: currentPartnerRef
       })
     });
     const data = await res.json();
-    log('Advice response: ' + JSON.stringify(data));
+    log('Advice: ' + JSON.stringify(data));
 
-    if (data.paid) {
+    if(data.paid) {
       clearInterval(adviceInterval);
-      setStatus('success', '✅ Pembayaran berhasil! Unlock 24 jam aktif.<br><small>Paid: ' + data.paid_time + '</small>');
+      setStatus('success', `✅ Pembayaran ${formatRupiah(currentAmount)} berhasil!`);
       document.getElementById('btn-check').style.display = 'none';
-      document.getElementById('btn-generate').style.display = 'none';
       document.getElementById('qr-wrap').innerHTML = '<div style="font-size:48px;text-align:center;">🎉</div>';
-      log('PAID! issuerId: ' + data.issuer_id);
+      showTxnDetail(data);
+      log('PAID! nett: ' + data.nett_amount + ', issuer: ' + data.issuer_id);
     }
   } catch(e) {
     log('Advice error: ' + e.message);
