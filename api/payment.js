@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-const ARRANET_URL = 'http://103.150.81.187:45065/api/multibiller';
+const ARRANET_URL = 'https://vision.arranetwork.com:45065/api/multibiller';
 const MERCHANT_ID = 'RND0001';
 const PRODUCT = '882002';
 
