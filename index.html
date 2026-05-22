@@ -1045,7 +1045,9 @@ async function getAI(isSurprise) {
     const raw = data.content?.[0]?.text || '';
     let clean = raw.replace(/```json|```/g,'').trim();
     const j1 = clean.indexOf('{'); const j2 = clean.lastIndexOf('}');
-    if(j1 > -1 && j2 > -1) clean = clean.substring(j1, j2+1);
+    if(j1 === -1 || j2 === -1) throw new Error('Response kosong atau tidak valid');
+    clean = clean.substring(j1, j2+1);
+    if(!clean || clean.length < 5) throw new Error('Response terlalu pendek');
     const parsed = JSON.parse(clean);
 
     if(typeof gtag !== 'undefined') gtag('event', 'rekomendasi_success', {
@@ -1425,7 +1427,9 @@ async function getFunFact() {
     const raw = data.content?.[0]?.text||'';
     let clean=raw.replace(/\`\`\`json|\`\`\`/g,'').trim();
     const j1=clean.indexOf('{'),j2=clean.lastIndexOf('}');
-    if(j1>-1&&j2>-1) clean=clean.substring(j1,j2+1);
+    if(j1===-1||j2===-1) throw new Error('Response kosong');
+    clean=clean.substring(j1,j2+1);
+    if(!clean||clean.length<5) throw new Error('Response terlalu pendek');
     const parsed=JSON.parse(clean);
 
     currentRekom={emoji:parsed.emoji||'💡',nama:parsed.nama||'FUN FACT',alasan:parsed.alasan||'',fun_fact:'',tags:parsed.tags||[]};
