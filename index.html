@@ -1416,7 +1416,7 @@ async function getFunFact() {
   const domain = domains[Math.floor(Math.random() * domains.length)];
 
   const prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact yang benar-benar mengejutkan tentang domain: ${domain}.${histNote} Fun fact harus spesifik dengan angka atau data konkret, dan bikin orang bilang "hah beneran?!" JANGAN tentang hewan kecuali domain-nya memang hewan. WAJIB tulis dalam Bahasa Indonesia yang natural seperti orang Indonesia asli bicara — bukan terjemahan kaku dari bahasa Inggris. Contoh yang SALAH: "terpendek sejarah", "tercepat dunia". Contoh yang BENAR: "terpendek sepanjang sejarah", "tercepat di dunia". Gunakan preposisi yang tepat. Seed: ${seed}. Balas HANYA JSON tanpa backtick:
-{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${domain}","fakta","unik"]}`;
+{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, harus lengkap dan bermakna — tidak boleh menggantung)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${domain}","fakta","unik"]}`;
 
   try {
     const res = await fetch('/api/recommend', {
