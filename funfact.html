@@ -160,9 +160,9 @@ async function generateFunFact(keepSeed) {
   // Build prompt
   let prompt;
   if (seedText) {
-    prompt = `Kamu adalah ensiklopedia fakta unik dunia. User sedang dalam mood/situasi: "${seedText}". Gunakan ini hanya sebagai inspirasi vibe atau tema — BUKAN sebagai bahan fakta. Cari fun fact ilmiah/historis/sains yang SUDAH TERBUKTI BENAR dari domain: ${domain}, yang secara vibe atau tema cocok dengan situasi user.${histNote} WAJIB: fakta harus akurat, ada angka konkret dari penelitian nyata, JANGAN ngarang statistik atau sebut brand/layanan yang mungkin tidak ada. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret dari sumber terpercaya, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
+    prompt = `Kamu adalah ensiklopedia fakta unik dunia. User sedang dalam mood/situasi: "${seedText}". Gunakan ini hanya sebagai inspirasi vibe atau tema — BUKAN sebagai bahan fakta. Cari fun fact ilmiah/historis/sains yang SUDAH TERBUKTI BENAR dari domain: ${domain}, yang secara vibe atau tema cocok dengan situasi user.${histNote} WAJIB: fakta harus akurat, ada angka konkret dari penelitian nyata, JANGAN ngarang statistik atau sebut brand/layanan yang mungkin tidak ada. Tulis dalam Bahasa Indonesia yang natural seperti orang Indonesia asli bicara — bukan terjemahan kaku dari bahasa Inggris. Contoh yang SALAH: "terpendek sejarah", "tercepat dunia". Contoh yang BENAR: "terpendek sepanjang sejarah", "tercepat di dunia". Gunakan preposisi yang tepat. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, harus lengkap dan bermakna — tidak boleh menggantung)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret dari sumber terpercaya, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
   } else {
-    prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact mengejutkan tentang domain: ${domain}.${histNote} Harus ada angka konkret, bikin orang bilang "hah beneran?!" Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
+    prompt = `Kamu adalah ensiklopedia fakta unik dunia. Berikan 1 fun fact mengejutkan tentang domain: ${domain}.${histNote} Harus ada angka konkret, bikin orang bilang "hah beneran?!" Tulis dalam Bahasa Indonesia yang natural dan santai. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
   }
 
   try {
@@ -171,7 +171,7 @@ async function generateFunFact(keepSeed) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 400
+        max_tokens: 500
       })
     });
     const data = await res.json();
