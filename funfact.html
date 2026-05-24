@@ -160,13 +160,27 @@ async function generateFunFact(keepSeed) {
   // Build prompt
   let prompt;
   if (seedText) {
-    prompt = `Kamu adalah akun Twitter/X anak Indonesia yang suka posting fakta random tengah malam. User lagi: "${seedText}". Cari fun fact dari domain: ${domain} yang nyambung sama vibes-nya.${histNote}
+    prompt = `Berikan 1 fakta mengejutkan dari domain: ${domain} yang nyambung sama situasi: "${seedText}".${histNote}
 
-Style wajib: singkat 1 kalimat, terasa seperti tweet random, bukan motivasi, bukan formal, jangan sopan berlebihan, jangan pakai emoji, jangan menjelaskan panjang, boleh existential crisis, humor tipis khas anak internet Indonesia. Fakta harus akurat, jangan ngarang. Bahasa Indonesia natural. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(judul fakta dalam huruf kapital semua, harus kalimat lengkap dan bermakna, tidak boleh disingkat, tidak boleh menggantung)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret dari sumber terpercaya, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
+Tulis field "alasan" 1 kalimat pendek, casual, kayak tweet:
+CONTOH: "kamu udah buang 6 bulan hidup cuma buat nunggu loading doang"
+JANGAN: "Penelitian menunjukkan bahwa rata-rata manusia menghabiskan..."
+
+Aturan: jangan pakai emoji, jangan formal, 1 kalimat, Bahasa Indonesia casual, fakta harus akurat. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(judul fakta dalam huruf kapital semua, harus kalimat lengkap dan bermakna, tidak boleh disingkat, tidak boleh menggantung)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret dari sumber terpercaya, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
   } else {
-    prompt = `Kamu adalah akun Twitter/X anak Indonesia yang suka posting fakta random tengah malam. Berikan 1 fun fact dari domain: ${domain}.${histNote}
+    prompt = `Berikan 1 fakta mengejutkan dari domain: ${domain}.${histNote}
 
-Style wajib: singkat 1 kalimat, terasa seperti tweet random, bukan motivasi, bukan formal, jangan sopan berlebihan, jangan pakai emoji, jangan menjelaskan panjang, boleh existential crisis, humor tipis khas anak internet Indonesia. Bahasa Indonesia natural. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
+Tulis field "alasan" seperti ini — 1 kalimat pendek, ngobrol, kayak nulis caption atau tweet:
+
+CONTOH YANG BENAR:
+"kamu udah buang 6 bulan hidup cuma buat nunggu loading doang"
+"otak manusia sebenernya ga bisa multitasking, yang ada cuma pura-pura bisa"
+"uang kertas yang kamu pegang udah disentuh ribuan orang yang ga cuci tangan"
+
+CONTOH YANG SALAH:
+"Penelitian menunjukkan bahwa rata-rata manusia menghabiskan waktu yang signifikan..."
+
+Aturan: jangan pakai emoji, jangan formal, 1 kalimat saja, Bahasa Indonesia casual. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
   }
 
   try {
