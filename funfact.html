@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fun Fact Random — randomly.id</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FFD60A">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--ink:#0D0D0D;--yellow:#FFD60A;--pink:#FF3B6B;--bg:#FFFEF5;--r:50px;--rs:16px;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100svh;display:flex;flex-direction:column;}
+
+/* HEADER */
+.header{background:var(--yellow);border-bottom:2px solid var(--ink);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;}
+.header-logo{font-size:16px;font-weight:800;text-decoration:none;color:var(--ink);}
+.header-logo span{background:var(--ink);color:var(--yellow);padding:0 4px;border-radius:3px;}
+.btn-back{background:none;border:2px solid var(--ink);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* HERO */
+.hero{background:var(--yellow);padding:20px 20px 24px;border-bottom:2px solid var(--ink);}
+.hero-title{font-size:26px;font-weight:800;line-height:1.2;margin-bottom:6px;}
+.hero-sub{font-size:13px;color:#555;}
+
+/* INPUT AREA */
+.input-wrap{padding:20px;}
+.input-label{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.seed-input{width:100%;padding:14px 16px;border:2px solid var(--ink);border-radius:var(--rs);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;background:white;color:var(--ink);resize:none;min-height:80px;box-shadow:3px 3px 0 var(--ink);}
+.seed-input:focus{outline:none;border-color:var(--pink);}
+.seed-input::placeholder{color:#AAA;}
+.char-count{font-size:11px;color:#AAA;text-align:right;margin-top:4px;}
+
+/* BUTTONS */
+.btn-wrap{padding:0 20px 20px;display:flex;flex-direction:column;gap:10px;}
+.btn-main{width:100%;padding:14px;background:var(--pink);color:white;border:2px solid var(--ink);border-radius:var(--r);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:all 0.12s;}
+.btn-main:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);}
+.btn-main:disabled{opacity:0.6;cursor:not-allowed;}
+.btn-clear{width:100%;padding:10px;background:transparent;color:#888;border:1.5px solid #DDD;border-radius:var(--r);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;cursor:pointer;}
+
+/* RESULT CARD */
+.result-wrap{padding:0 20px 24px;flex:1;}
+.result-card{background:var(--yellow);border:2.5px solid var(--ink);border-radius:var(--rs);padding:20px;box-shadow:4px 4px 0 var(--ink);text-align:center;}
+.r-emoji{font-size:48px;display:block;margin-bottom:12px;}
+.r-cat{font-size:11px;font-weight:700;letter-spacing:1px;color:#555;margin-bottom:6px;}
+.r-nama{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:12px;}
+.r-alasan{font-size:13px;line-height:1.7;color:#333;font-style:italic;margin-bottom:16px;}
+.r-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px;}
+.r-tag{padding:4px 10px;border:1.5px solid var(--ink);border-radius:20px;font-size:11px;font-weight:600;background:white;}
+.r-seed{font-size:11px;color:#888;margin-bottom:16px;}
+.r-actions{display:flex;gap:8px;}
+.btn-share{flex:1;padding:10px;background:#25D366;color:white;border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;}
+.btn-copy{padding:10px 14px;background:white;border:2px solid var(--ink);border-radius:var(--r);font-size:13px;cursor:pointer;}
+.btn-lagi{width:100%;padding:10px;background:var(--ink);color:var(--yellow);border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;margin-top:10px;}
+
+/* LOADING */
+.loading-card{background:var(--yellow);border:2.5px solid var(--ink);border-radius:var(--rs);padding:32px 20px;box-shadow:4px 4px 0 var(--ink);text-align:center;}
+.load-dots{display:flex;gap:6px;justify-content:center;margin-bottom:12px;}
+.dot{width:10px;height:10px;background:var(--ink);border-radius:50%;animation:bounce 0.8s infinite;}
+.dot:nth-child(2){animation-delay:0.15s;}
+.dot:nth-child(3){animation-delay:0.3s;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.load-txt{font-size:13px;font-weight:600;color:#555;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:var(--yellow);padding:10px 20px;border-radius:var(--r);font-size:13px;font-weight:700;transition:transform 0.3s;z-index:999;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* FOOTER */
+.footer{padding:16px 20px;text-align:center;border-top:1px solid #EEE;}
+.footer a{font-size:11px;color:#AAA;text-decoration:none;}
+.footer-sep{color:#DDD;margin:0 8px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="btn-back" onclick="window.location.href='/'">←</button>
+  <a class="header-logo" href="/">random<span>ly</span>.id</a>
+  <div style="width:36px;"></div>
+</div>
+
+<div class="hero">
+  <div class="hero-title">🤯 Fun Fact Random</div>
+  <div class="hero-sub">Tulis mood kamu sekarang — AI cari fun fact yang nyambung sama vibesmu!</div>
+</div>
+
+<div class="input-wrap">
+  <div class="input-label">Mood / situasi kamu sekarang (opsional)</div>
+  <textarea class="seed-input" id="seed-input" maxlength="150" placeholder="Mood atau situasi kamu sekarang... (contoh: bosen di kantor, lagi makan, mikirin mantan, ga bisa tidur)" oninput="updateCount()"></textarea>
+  <div class="char-count"><span id="char-count">0</span>/150</div>
+</div>
+
+<div class="btn-wrap">
+  <button class="btn-main" id="btn-generate" onclick="generateFunFact()">🎲 Randomin Fun Fact Dong!</button>
+</div>
+
+<div class="result-wrap" id="result-wrap"></div>
+
+<div class="footer">
+  <a href="/privacy.html">Privacy Policy</a>
+  <span class="footer-sep">·</span>
+  <span style="font-size:11px;color:#AAA;">randomly.id — lagi random? randomly aja.</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── HISTORY ──
+var ffHistory = JSON.parse(localStorage.getItem('rnd_ff_history') || '[]');
+
+function updateCount() {
+  const val = document.getElementById('seed-input').value;
+  document.getElementById('char-count').textContent = val.length;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function getShareText(nama, alasan, seedText) {
+  const seedNote = seedText ? `\n\nKonteks: "${seedText}"` : '';
+  return `🤯 FUN FACT RANDOM\n\n${nama}\n\n${alasan}${seedNote}\n\nrandomly.id — lagi random? randomly aja.`;
+}
+
+async function generateFunFact(keepSeed) {
+  const input = document.getElementById('seed-input');
+  const seedText = input ? input.value.trim() : (window._lastSeed || '');
+  window._lastSeed = seedText; // simpan seed terakhir
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = true;
+  btn.textContent = 'Lagi korek-korek fakta unik...';
+  // Pastikan textarea tetap ada isinya
+  if(input && seedText) { input.value = seedText; updateCount(); }
+
+  // Show loading
+  document.getElementById('result-wrap').innerHTML = `
+    <div class="loading-card">
+      <div class="load-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div class="load-txt">Lagi korek-korek fakta unik...</div>
+    </div>`;
+
+  // Domains untuk variasi
+  const domains = ['sejarah manusia','teknologi & sains','negara & geografi','bahasa & budaya',
+    'makanan & kuliner','musik & seni','olahraga & rekor','tubuh manusia','luar angkasa',
+    'ekonomi & uang','hukum & politik','arkeologi','psikologi','matematika','transportasi'];
+  const domain = domains[Math.floor(Math.random() * domains.length)];
+  const seed = Math.floor(Math.random() * 999999);
+
+  const histNote = ffHistory.length > 0
+    ? ` Jangan ulangi: ${ffHistory.slice(-5).join(', ')}.`
+    : '';
+
+  // Build prompt
+  let prompt;
+  if (seedText) {
+    prompt = `Kamu adalah akun Twitter/X anak Indonesia yang suka posting fakta random tengah malam. User lagi: "${seedText}". Cari fun fact dari domain: ${domain} yang nyambung sama vibes-nya.${histNote}
+
+Style wajib: singkat 1 kalimat, terasa seperti tweet random, bukan motivasi, bukan formal, jangan sopan berlebihan, jangan pakai emoji, jangan menjelaskan panjang, boleh existential crisis, humor tipis khas anak internet Indonesia. Fakta harus akurat, jangan ngarang. Bahasa Indonesia natural. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(judul fakta dalam huruf kapital semua, harus kalimat lengkap dan bermakna, tidak boleh disingkat, tidak boleh menggantung)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret dari sumber terpercaya, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
+  } else {
+    prompt = `Kamu adalah akun Twitter/X anak Indonesia yang suka posting fakta random tengah malam. Berikan 1 fun fact dari domain: ${domain}.${histNote}
+
+Style wajib: singkat 1 kalimat, terasa seperti tweet random, bukan motivasi, bukan formal, jangan sopan berlebihan, jangan pakai emoji, jangan menjelaskan panjang, boleh existential crisis, humor tipis khas anak internet Indonesia. Bahasa Indonesia natural. Seed: ${seed}. Balas HANYA JSON tanpa backtick:\n{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, maks 5 kata)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["tag1","tag2","tag3"]}`;
+  }
+
+  try {
+    const res = await fetch('/api/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 500
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid response');
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    // Save to history
+    const ffKey = (parsed.nama || '').toUpperCase().trim().split(' ').slice(0, 3).join(' ');
+    if (ffKey && !ffHistory.includes(ffKey)) {
+      ffHistory.push(ffKey);
+      if (ffHistory.length > 30) ffHistory.shift();
+      localStorage.setItem('rnd_ff_history', JSON.stringify(ffHistory));
+    }
+
+    const seedLabel = seedText ? `<div class="r-seed">💡 Berdasarkan: "${seedText}"</div>` : '';
+
+    document.getElementById('result-wrap').innerHTML = `
+      <div class="result-card">
+        <span class="r-emoji">${parsed.emoji || '🤯'}</span>
+        <div class="r-cat">FUN FACT RANDOM</div>
+        <div class="r-nama">${parsed.nama || ''}</div>
+        <div class="r-alasan">${parsed.alasan || ''}</div>
+        ${seedLabel}
+        <div class="r-tags">${(parsed.tags || []).map(t => `<span class="r-tag">${t}</span>`).join('')}</div>
+        <div class="r-actions">
+          <button class="btn-share" onclick="shareWA()">💬 Share WA</button>
+          <button class="btn-copy" onclick="copyTeks()">📋</button>
+        </div>
+        <button class="btn-lagi" onclick="generateFunFact()">🎲 Fun Fact lain!</button>
+      </div>`;
+
+    window._currentFact = { nama: parsed.nama, alasan: parsed.alasan, seedText };
+
+  } catch(e) {
+    document.getElementById('result-wrap').innerHTML = `
+      <div class="result-card" style="text-align:center;">
+        <span style="font-size:32px">😅</span>
+        <div style="font-size:14px;margin-top:10px;font-weight:600">Aduh error nih, coba lagi!</div>
+      </div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🎲 Randomin Fun Fact Dong!';
+}
+
+function shareWA() {
+  if (!window._currentFact) return;
+  const { nama, alasan, seedText } = window._currentFact;
+  window.open('https://wa.me/?text=' + encodeURIComponent(getShareText(nama, alasan, seedText)), '_blank');
+}
+
+function copyTeks() {
+  if (!window._currentFact) return;
+  const { nama, alasan, seedText } = window._currentFact;
+  navigator.clipboard.writeText(getShareText(nama, alasan, seedText))
+    .then(() => showToast('✓ Teks disalin!'));
+}
+</script>
+</body>
+</html>

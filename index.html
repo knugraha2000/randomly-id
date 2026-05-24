@@ -1415,8 +1415,21 @@ async function getFunFact() {
   const domains = ['sejarah manusia','teknologi & sains','negara & geografi','bahasa & budaya','makanan & kuliner','musik & seni','olahraga & rekor','tubuh manusia','luar angkasa','ekonomi & uang','hukum & politik','arkeologi','psikologi','matematika','transportasi'];
   const domain = domains[Math.floor(Math.random() * domains.length)];
 
-  const prompt = `Kamu adalah teman yang suka berbagi fakta absurd, relatable, dan sedikit chaotic — tapi selalu akurat. Berikan 1 fun fact dari domain: ${domain} yang bikin orang berhenti scroll dan bilang "HAH BENERAN?! 😭"${histNote} Kriteria fun fact yang bagus: ada angka atau data konkret yang mengejutkan, relevan dengan kehidupan sehari-hari, atau absurd tapi nyata. JANGAN tentang hewan kecuali domain-nya memang hewan. Tulis penjelasan dengan gaya santai, sedikit lebay tapi faktual — seperti teman yang excited cerita sesuatu yang baru dia tau. Bahasa Indonesia natural, bukan terjemahan kaku. Seed: ${seed}. Balas HANYA JSON tanpa backtick:
-{"emoji":"(1 emoji)","nama":"(JUDUL FAKTA KAPITAL, harus lengkap dan bermakna — tidak boleh menggantung)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${domain}","fakta","unik"]}`;
+  const prompt = `Kamu adalah akun Twitter/X anak Indonesia yang suka posting fakta random tengah malam. Berikan 1 fun fact dari domain: ${domain}.${histNote}
+
+Style wajib:
+- Singkat, 1 kalimat penjelasan saja
+- Terasa seperti tweet random yang bikin orang reply "hah seriusan?"
+- Bukan motivasi, bukan fakta ilmiah formal
+- Jangan terlalu sopan atau kaku
+- Jangan pakai emoji
+- Jangan menjelaskan panjang lebar
+- Boleh sedikit existential crisis
+- Humor tipis khas anak internet Indonesia
+- Bahasa Indonesia natural, bukan terjemahan
+
+Seed: ${seed}. Balas HANYA JSON tanpa backtick:
+{"emoji":"(1 emoji)","nama":"(judul fakta dalam huruf kapital semua, harus kalimat lengkap dan bermakna, tidak boleh disingkat, tidak boleh menggantung)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${domain}","fakta","unik"]}`;
 
   try {
     const res = await fetch('/api/recommend', {
