@@ -23,20 +23,18 @@ module.exports = async function handler(req, res) {
           ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
           : null;
         return res.status(200).json({ poster_url: posterUrl });
-      } catch(e) {
+      } catch (e) {
         return res.status(200).json({ poster_url: null });
       }
     }
 
     // ── ENGINE SELECTION ──
     // 'claude' | 'gemini' | 'random'
-    // Default: random (50/50 Claude vs Gemini) kalau kedua key tersedia
     const claudeKey = process.env.ANTHROPIC_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
 
     let selectedEngine = engine || 'gemini';
 
-    // Auto random kalau ada kedua key
     if (selectedEngine === 'random') {
       if (claudeKey && geminiKey) {
         selectedEngine = Math.random() < 0.5 ? 'claude' : 'gemini';
@@ -47,9 +45,8 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Fallback ke claude kalau gemini key tidak ada
+    // Fallback
     if (selectedEngine === 'gemini' && !geminiKey) selectedEngine = 'claude';
-    // Fallback ke gemini kalau claude key tidak ada
     if (selectedEngine === 'claude' && !claudeKey) selectedEngine = 'gemini';
 
     const prompt = messages?.[messages.length - 1]?.content || '';
@@ -79,12 +76,9 @@ module.exports = async function handler(req, res) {
       const geminiData = await geminiRes.json();
       if (!geminiRes.ok) return res.status(geminiRes.status).json({ error: geminiData });
 
-      // Normalize ke format Claude supaya frontend tidak perlu ubah
       let text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      // Strip markdown backticks yang sering ditambah Gemini
-      text = text.replace(/```json
-?/gi, '').replace(/```
-?/gi, '').trim();
+      text = text.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim();
+
       return res.status(200).json({
         content: [{ type: 'text', text }],
         engine_used: 'gemini'
@@ -115,4 +109,4 @@ module.exports = async function handler(req, res) {
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error', detail: error.message });
   }
-}
+};
