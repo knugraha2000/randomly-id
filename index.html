@@ -292,7 +292,7 @@ body {
 .ff-txt { font-size: 11px; color: var(--inkm); line-height: 1.5; font-weight: 400; }
 .city-input { width: 100%; padding: 8px 12px; border: 2px solid var(--border); border-radius: var(--rs); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--ink); background: var(--w); margin-top: 8px; outline: none; }
 .city-input:focus { border-color: var(--ink); }
-.btn-funfact { width: 100%; padding: 12px; background: #FF3B6B; color: white; border: 2px solid #0D0D0D; border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 #0D0D0D; }
+.btn-funfact { padding: 12px 8px; background: #FF3B6B; color: white; border: 2px solid #0D0D0D; border-radius: 50px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 #0D0D0D; display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.3; }
 .btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #0D0D0D; }
 /* POSTER */
 /* SPLASH SCREEN */
@@ -601,9 +601,14 @@ body {
     <div class="hero-sub" id="hero-sub">Pilih kategori, jawab 2 hal, langsung dapat rekomendasi.</div>
   </div>
 
-  <!-- FUN FACT BUTTON -->
-  <div style="padding: 12px 20px 12px;">
-    <button class="btn-funfact" onclick="getFunFact()" id="btn-funfact" style="width:100%;"></button>
+  <!-- FUN FACT + QUIZ BUTTONS -->
+  <div style="padding: 12px 20px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+    <button class="btn-funfact" onclick="getFunFact()" id="btn-funfact"></button>
+    <button onclick="window.location.href='/quiz.html'" style="background:#FFD60A;color:#0D0D0D;border:2px solid #0D0D0D;border-radius:50px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:800;cursor:pointer;padding:12px 8px;box-shadow:3px 3px 0 #0D0D0D;transition:all 0.12s;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.3;" onmousedown="this.style.transform='translate(2px,2px)';this.style.boxShadow='1px 1px 0 #0D0D0D'" onmouseup="this.style.transform='';this.style.boxShadow='3px 3px 0 #0D0D0D'">
+      <span style="font-size:18px;">🧠</span>
+      <span>Quiz Random!</span>
+      <span style="font-size:10px;font-weight:600;opacity:0.65;">5 soal · 2 kesempatan</span>
+    </button>
   </div>
 
   <!-- CATEGORIES -->
@@ -1548,7 +1553,7 @@ function initContent() {
   const bg = document.getElementById('btn-gabut');
   if(bg) bg.textContent = CONTENT.btn_gabut;
   const bf = document.getElementById('btn-funfact');
-  if(bf) bf.textContent = CONTENT.btn_funfact;
+  if(bf) bf.innerHTML = `<span style="font-size:18px;">💡</span><span>${CONTENT.btn_funfact || 🎲 Fun Fact!}</span><span style="font-size:10px;font-weight:600;opacity:0.65;">fakta random acak</span>`;
   // Cat labels object — override from CONTENT
   Object.assign(catLabels, CONTENT.cat_labels);
   // Loading messages — override
