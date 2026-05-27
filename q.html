@@ -457,7 +457,7 @@ function shareResult(correct, total) {
   const bucket = pct === 100 ? 100 : pct >= 80 ? 80 : pct >= 60 ? 60 : pct >= 40 ? 40 : 0;
   const desc = pool[bucket][Math.floor(Math.random() * pool[bucket].length)];
   const challenge = correct < total ? '\nKamu bisa lebih tinggi ga? 👀' : '\nBerani coba ngalahin ini? 😈';
-  const text = `Quiz Random di randomly.id\n\n${desc}\n${challenge}\nrandomly.id`;
+  const text = `Quiz Random di randomly.id\n\nSaya dapat nilai ${correct}/${total} (${pct}%). ${desc}${challenge}\n\nCobain deh → randomly.id`;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
