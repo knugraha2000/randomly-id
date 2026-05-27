@@ -1,14 +1,9 @@
 {
+  "rewrites": [
+    { "source": "/q", "destination": "/quiz.html" }
+  ],
   "redirects": [
-    {
-      "source": "/quiz.html",
-      "destination": "/",
-      "permanent": false
-    },
-    {
-      "source": "/funfact.html",
-      "destination": "/",
-      "permanent": false
-    }
+    { "source": "/quiz.html", "destination": "/", "permanent": false },
+    { "source": "/funfact.html", "destination": "/", "permanent": false }
   ]
 }
