@@ -52,7 +52,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .response{padding:16px 18px;border-radius:var(--r);margin-bottom:12px;font-size:14px;font-weight:600;line-height:1.7;border:2px solid var(--ink);animation:slideUp 0.3s ease;}
 .response.wrong-msg{background:#FFF0F5;border-color:var(--pink);}
 .response.correct-msg{background:#F0FFF8;border-color:var(--green);}
-.response.answer-msg{background:#F5F5F5;font-size:13px;font-weight:500;line-height:1.8;}
+.response.answer-msg{background:#F5F5F5;font-size:14px;font-weight:600;line-height:1.75;}
 #response-wrap{margin-top:16px;}
 #btn-next-wrap{margin-top:16px;padding-bottom:8px;}
 @keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
@@ -322,7 +322,8 @@ function selectAnswer(letter, btn) {
     btn.classList.add('correct');
     allBtns.forEach(b => { b.disabled = true; if(b !== btn) b.classList.add('disabled-gray'); });
     document.getElementById('response-wrap').innerHTML = `
-      <div class="response correct-msg">✅ ${getRandom(correctResponses)}</div>`;
+      <div class="response correct-msg">✅ ${getRandom(correctResponses)}</div>
+      <div class="response answer-msg">💡 ${q.explanation}</div>`;
     showNextButton(q);
     updateScore();
   } else {
@@ -391,11 +392,42 @@ async function nextQuestion() {
 function showEndScreen() {
   const pct = Math.round((scoreCorrect / TOTAL_Q) * 100);
   let emoji, title, sub;
-  if(pct === 100){ emoji='🏆'; title='Perfect!'; sub='Kamu tau segalanya. Serius deh.'; }
-  else if(pct >= 80){ emoji='🎉'; title='Keren!'; sub='Hampir sempurna. Satu lagi bisa full!'; }
-  else if(pct >= 60){ emoji='😎'; title='Lumayan!'; sub='Di atas rata-rata. Boleh lah.'; }
-  else if(pct >= 40){ emoji='😅'; title='Ya gitu deh'; sub='Setengahnya bener. Setengahnya... ya tau lah.'; }
-  else{ emoji='💀'; title='Aduh'; sub='Mungkin kurang baca-baca nih. Coba lagi?'; }
+
+  const perfect = [
+    { e:'🧠', t:'Otakmu Ilegal', s:'Kamu harusnya ditangkap karena terlalu pinter. Ini bukan pujian, ini ancaman.' },
+    { e:'👽', t:'Bukan Manusia', s:'Gak ada manusia normal yang bisa dapet nilai segini. Kamu alien, kan?' },
+    { e:'🏆', t:'Sempurna Banget', s:'5/5. Bahkan Google aja kadang salah. Tapi kamu? Enggak. Serem.' },
+  ];
+  const great = [
+    { e:'🤓', t:'Hampir Jenius', s:'Kurang dikit aja. Sayang banget, padahal udah hampir kelihatan pinternya.' },
+    { e:'📚', t:'Kebanyakan Baca', s:'4/5 bener. Hidupmu kayaknya lebih sering sama buku daripada sama manusia.' },
+    { e:'🎯', t:'Nyaris Sempurna', s:'Satu soal salah doang. Itu soalnya yang salah, bukan kamu. Percaya deh.' },
+  ];
+  const ok = [
+    { e:'🪄', t:'Lumayan Ajaib', s:'3/5 bener. Setengah pinter, setengah hoki. Kombinasi yang cukup untuk bertahan hidup.' },
+    { e:'🧩', t:'Agak Nyambung', s:'Otakmu kayak puzzle yang kurang beberapa keping. Tapi tetep bisa ditebak bentuknya!' },
+    { e:'😎', t:'Medioker Tapi PD', s:'Nilainya biasa, tapi aura-nya luar biasa. Itu juga bakat.' },
+  ];
+  const meh = [
+    { e:'🥔', t:'Kentang Terhormat', s:'2/5. Tidak istimewa, tapi konsisten. Seperti kentang — selalu ada, tidak pernah wow.' },
+    { e:'🦆', t:'Bebek Bingung', s:'Jawabnya kayak bebek nyebrang jalan: random, bingung, tapi entah kenapa selamat.' },
+    { e:'💤', t:'Ngantuk Pas Quiz', s:'Nilai segini wajar kalau kamu ngerjainnya sambil tidur. Atau sambil makan. Atau keduanya.' },
+  ];
+  const bad = [
+    { e:'🍌', t:'Pisang Lebih Pinter', s:'Serius. Pisang punya 60% DNA sama manusia. Kamu tadi kayaknya pakai yang 40% sisanya.' },
+    { e:'🪨', t:'Batu Bangku', s:'Batu juga bisa dapet nilai segini kalau dilempar ke layar. Coba lagi, manusia.' },
+    { e:'💀', t:'Kasihan Banget', s:'0-1 bener dari 5. Ini bukan kegagalan, ini prestasi. Susah lho dapet nilai sesalah ini.' },
+  ];
+
+  let pool;
+  if(pct === 100) pool = perfect;
+  else if(pct >= 80) pool = great;
+  else if(pct >= 60) pool = ok;
+  else if(pct >= 40) pool = meh;
+  else pool = bad;
+
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const emoji = pick.e, title = pick.t, sub = pick.s;
 
   document.getElementById('quiz-wrap').innerHTML = `
     <div class="end-card">
