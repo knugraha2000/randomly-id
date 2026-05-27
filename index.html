@@ -295,34 +295,6 @@ body {
 .btn-funfact { padding: 12px 8px; background: #FF3B6B; color: white; border: 2px solid #0D0D0D; border-radius: 50px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.12s; box-shadow: 3px 3px 0 #0D0D0D; display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.3; }
 .btn-funfact:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #0D0D0D; }
 /* POSTER */
-/* SPLASH SCREEN */
-#splash-screen {
-  position: fixed; inset: 0; z-index: 9999;
-  background: #FFD60A;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  transition: opacity 0.5s ease;
-  cursor: pointer;
-}
-#splash-screen.fade-out { opacity: 0; pointer-events: none; }
-#splash-screen.hidden { display: none; }
-.splash-logo {
-  width: 80%; max-width: 300px;
-  animation: splashFadeUp 0.6s ease forwards;
-  opacity: 0;
-}
-.splash-skip {
-  position: absolute; bottom: 40px;
-  background: none; border: none;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13px; color: rgba(0,0,0,0.4);
-  cursor: pointer; text-decoration: underline;
-}
-@keyframes splashFadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .poster-wrap { width: 100%; aspect-ratio: 2/3; max-height: 420px; background: #F0F0F0; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 14px; position: relative; }
 .poster-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; transition: opacity 0.3s; background: #111; }
 .poster-wrap img.loading { opacity: 0; }
@@ -576,12 +548,6 @@ body {
 
 <!-- ══════════ HOME ══════════ -->
 <!-- SPLASH SCREEN -->
-<div id="splash-screen">
-  <img src="/logo-splash.png" alt="randomly.id" class="splash-logo">
-  <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:#333;text-align:center;max-width:280px;line-height:1.7;margin-top:16px;padding:0 24px;">Platform rekomendasi AI pertama di Indonesia. Solusi ke-random-an kamu dengan 8 kategori plus bonus random fun fact yang bikin seru. 🎲</p>
-  <button class="splash-skip" onclick="dismissSplash()">Skip</button>
-</div>
-
 <div id="pg-home">
 
   <div class="header">
@@ -1516,28 +1482,6 @@ function ke(page) {
 }
 function pSort(el) { document.querySelectorAll('.schip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
 
-// ── SPLASH ──
-function dismissSplash() {
-  const splash = document.getElementById('splash-screen');
-  if(!splash) return;
-  splash.classList.add('fade-out');
-  setTimeout(function() { splash.classList.add('hidden'); }, 500);
-  sessionStorage.setItem('rnd_splash_seen', '1');
-}
-
-function initSplash() {
-  // Kalau sudah pernah lihat splash, skip
-  if(sessionStorage.getItem('rnd_splash_seen')) {
-    const splash = document.getElementById('splash-screen');
-    if(splash) splash.classList.add('hidden');
-    return;
-  }
-  // Auto dismiss setelah 2.5 detik
-  setTimeout(dismissSplash, 5000);
-  // Tap anywhere to dismiss
-  document.getElementById('splash-screen').addEventListener('click', dismissSplash);
-}
-
 // ── INIT ──
 function initContent() {
   if(typeof CONTENT === 'undefined') return;
@@ -1565,7 +1509,6 @@ function initContent() {
   if(fp) fp.textContent = CONTENT.footer_copy;
 }
 
-initSplash();
 setGreeting();
 checkPaywall();
 initContent();
