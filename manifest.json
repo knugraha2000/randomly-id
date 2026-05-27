@@ -1,0 +1,24 @@
+{
+  "name": "randomly.id",
+  "short_name": "randomly",
+  "description": "Platform rekomendasi AI pertama di Indonesia. Solusi ke-random-an kamu sehari-hari.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFD60A",
+  "theme_color": "#FFD60A",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
