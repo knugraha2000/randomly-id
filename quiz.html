@@ -13,34 +13,28 @@
 }
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100svh;display:flex;flex-direction:column;}
 
-/* HEADER */
 .header{background:var(--yellow);border-bottom:2.5px solid var(--ink);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
 .header-logo{font-size:16px;font-weight:900;text-decoration:none;color:var(--ink);letter-spacing:-0.5px;}
 .header-logo span{background:var(--ink);color:var(--yellow);padding:1px 5px;border-radius:4px;}
 .btn-back{background:none;border:2px solid var(--ink);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
-/* MAIN */
 .main{flex:1;padding:20px;max-width:480px;margin:0 auto;width:100%;}
 
-/* HERO */
 .hero{text-align:center;padding:24px 0 20px;}
 .hero-badge{display:inline-block;background:var(--pink);color:white;font-size:11px;font-weight:800;padding:4px 12px;border-radius:var(--pill);letter-spacing:1px;margin-bottom:12px;border:2px solid var(--ink);}
 .hero-title{font-size:28px;font-weight:900;line-height:1.2;letter-spacing:-0.5px;margin-bottom:6px;}
 .hero-sub{font-size:13px;color:#666;}
 
-/* SCORE */
 .score-wrap{display:flex;gap:8px;margin-bottom:20px;}
 .score-card{flex:1;background:white;border:2px solid var(--ink);border-radius:var(--r);padding:12px;text-align:center;box-shadow:3px 3px 0 var(--ink);}
 .score-num{font-size:24px;font-weight:900;}
 .score-lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;}
 
-/* QUESTION CARD */
 .q-card{background:var(--yellow);border:2.5px solid var(--ink);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:4px 4px 0 var(--ink);position:relative;overflow:hidden;}
 .q-number{font-size:11px;font-weight:700;color:#666;letter-spacing:1px;margin-bottom:8px;}
 .q-text{font-size:17px;font-weight:800;line-height:1.4;letter-spacing:-0.3px;}
 .q-attempts{position:absolute;top:16px;right:16px;background:var(--ink);color:var(--yellow);font-size:11px;font-weight:800;padding:3px 8px;border-radius:var(--pill);}
 
-/* CHOICES */
 .choices{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
 .choice-btn{width:100%;padding:14px 16px;background:white;border:2px solid var(--ink);border-radius:var(--r);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:all 0.12s;box-shadow:3px 3px 0 var(--ink);display:flex;align-items:center;gap:10px;}
 .choice-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);}
@@ -55,18 +49,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}};
 
-/* RESPONSE */
 .response{padding:14px 16px;border-radius:var(--r);margin-bottom:16px;font-size:14px;font-weight:600;line-height:1.5;border:2px solid var(--ink);animation:slideUp 0.3s ease;}
 .response.wrong-msg{background:#FFF0F5;border-color:var(--pink);}
 .response.correct-msg{background:#F0FFF8;border-color:var(--green);}
 .response.answer-msg{background:#F5F5F5;}
 @keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-/* BUTTONS */
 .btn-next{width:100%;padding:14px;background:var(--ink);color:var(--yellow);border:2px solid var(--ink);border-radius:var(--pill);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;cursor:pointer;box-shadow:3px 3px 0 rgba(0,0,0,0.2);transition:all 0.12s;letter-spacing:-0.3px;}
 .btn-next:active{transform:translate(2px,2px);box-shadow:1px 1px 0 rgba(0,0,0,0.2);}
+.btn-next:disabled{opacity:0.5;cursor:not-allowed;}
 
-/* LOADING */
 .loading{text-align:center;padding:40px 20px;}
 .load-dots{display:flex;gap:6px;justify-content:center;margin-bottom:12px;}
 .dot{width:10px;height:10px;background:var(--ink);border-radius:50%;animation:bounce 0.8s infinite;}
@@ -75,7 +67,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
 .load-txt{font-size:13px;font-weight:600;color:#666;}
 
-/* END SCREEN */
+/* Prefetch indicator — subtle di tombol next */
+.btn-next.loading-next::after{content:' ⏳';font-size:12px;opacity:0.6;}
+
 .end-card{background:var(--yellow);border:2.5px solid var(--ink);border-radius:var(--r);padding:28px 20px;text-align:center;box-shadow:4px 4px 0 var(--ink);}
 .end-emoji{font-size:56px;margin-bottom:12px;display:block;}
 .end-title{font-size:24px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px;}
@@ -85,7 +79,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .btn-restart{width:100%;padding:14px;background:var(--ink);color:var(--yellow);border:none;border-radius:var(--pill);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;}
 .btn-share{width:100%;padding:14px;background:#25D366;color:white;border:none;border-radius:var(--pill);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;}
 
-/* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:var(--yellow);padding:10px 20px;border-radius:var(--pill);font-size:13px;font-weight:700;transition:transform 0.3s;z-index:999;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
@@ -143,12 +136,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 <script>
 const TOTAL_Q = 5;
-let questions = [];
+const TOPICS = ['sejarah dunia','sains & alam','teknologi','budaya & seni','geografi','tubuh manusia','makanan','olahraga','bahasa','ekonomi'];
+
 let currentQ = 0;
 let attemptsLeft = 2;
 let scoreCorrect = 0;
 let scoreWrong = 0;
 let answered = false;
+
+// Queue: soal yang sudah di-fetch, siap tampil
+let questionQueue = [];
+// Promise prefetch yang sedang berjalan
+let prefetchPromise = null;
 
 const wrongResponses = [
   "Aduh, salah nih. Coba sekali lagi deh!",
@@ -157,21 +156,18 @@ const wrongResponses = [
   "Wah meleset! Pikir lagi ya, 1 kesempatan terakhir.",
   "Salah sih, tapi tenang masih ada 1 kesempatan lagi!"
 ];
-
 const finalWrongResponses = [
-  "Duh, salah lagi. Mending banyak baca nih!",
-  "Zonk! Tapi setidaknya kamu tau sekarang.",
-  "Yaah salah. Tapi ga apa, sekarang udah tau kan?",
-  "Salah total. Ini salah satu fakta yang sering bikin kaget.",
-  "Missed! Tapi sekarang udah nambah ilmu satu."
+  "Zonk! Tapi sekarang udah tau kan?",
+  "Yaah salah. Tapi ga apa, sekarang udah nambah ilmu satu.",
+  "Missed! Tapi sekarang udah nambah ilmu satu.",
+  "Haduh. Tapi minimal sekarang tau jawabannya!"
 ];
-
 const correctResponses = [
-  "Bener! Kamu tau banget.",
-  "Tepat sekali! Pinter juga.",
-  "Yap, bener! Nice.",
-  "Correct! Kamu ga bisa dibohongin.",
-  "Benar! Langsung tau ya."
+  "Bener! Langsung tau ya.",
+  "Yap! Kamu emang ga bisa dibohongin.",
+  "Correct! Pinter juga.",
+  "Nice! Tau dari mana?",
+  "Bener! Kamu tau banget."
 ];
 
 function getRandom(arr) {
@@ -191,71 +187,74 @@ function updateScore() {
   document.getElementById('score-num').textContent = `${Math.min(currentQ+1,TOTAL_Q)}/${TOTAL_Q}`;
 }
 
-async function loadQuestions() {
+// ── FETCH 1 SOAL ──
+async function fetchOneQuestion() {
+  const topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
   const seed = Math.floor(Math.random() * 999999);
-  const topics = ['sejarah dunia','sains & alam','teknologi','budaya & seni','geografi','tubuh manusia','makanan','olahraga','bahasa','ekonomi'];
-  const topic = topics[Math.floor(Math.random() * topics.length)];
 
-  const prompt = `Buat ${TOTAL_Q} soal kuis pilihan ganda yang aneh, counterintuitive, dan bikin orang mikir keras. Topik: ${topic}. Seed: ${seed}.
+  const prompt = `Buat 1 soal kuis pilihan ganda yang aneh, counterintuitive, dan bikin orang mikir keras. Topik: ${topic}. Seed: ${seed}.
 
-FILOSOFI SOAL: Soal yang bagus adalah soal yang jawabannya bikin orang bilang "hah, beneran?" setelah tau jawabannya. Bukan soal hafalan.
-
-CONTOH SOAL YANG BAGUS:
-Q: "Berapa lama waktu yang dibutuhkan untuk sinar matahari sampai ke bumi?"
-A. 2 menit  B. 8 menit  C. 30 menit  D. 2 jam
-(semua terasa masuk akal, tapi jarang yang tau persis)
-
-Q: "Negara mana yang punya garis pantai terpanjang di dunia?"
-A. Australia  B. Rusia  C. Kanada  D. Indonesia
-(orang kira Australia atau Rusia, padahal Kanada)
-
-Q: "Berapa % tubuh manusia yang terdiri dari air?"
-A. 45%  B. 60%  C. 78%  D. 90%
+FILOSOFI: Jawaban harus bikin orang bilang "hah, beneran?" setelah tau. Bukan hafalan biasa.
 
 ATURAN WAJIB:
-1. Semua pilihan harus sama-sama terasa masuk akal — tidak ada yang jelas-jelas salah
+1. Semua pilihan harus sama-sama terasa masuk akal
 2. Jawaban benar harus counterintuitive atau mengejutkan
-3. Pertanyaan boleh aneh, absurd, atau unexpected
-4. Hindari soal sejarah hafalan yang predictable
-5. Pilih topik yang jarang dibahas — bukan fakta umum
-6. Semua pilihan harus tipe data yang sama (semua angka / semua negara / semua nama)
-7. Bahasa Indonesia casual, bukan formal
+3. Hindari soal hafalan yang predictable
+4. Semua pilihan harus tipe data yang sama (semua angka / semua negara / semua nama)
+5. Bahasa Indonesia casual
 
-Balas HANYA JSON array tanpa backtick:
-[{"question":"pertanyaan","choices":["A. ..","B. ..","C. ..","D. .."],"answer":"A","explanation":"penjelasan singkat kenapa jawabannya itu, casual dan sedikit lucu — boleh ada unsur 'hah ternyata'"}]`;
+Balas HANYA JSON object tanpa backtick:
+{"question":"pertanyaan","choices":["A. ..","B. ..","C. ..","D. .."],"answer":"A","explanation":"penjelasan singkat kenapa itu jawabannya, casual dan sedikit mengejutkan"}`;
 
-  try {
-    const res = await fetch('/api/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [{ role: 'user', content: prompt }], max_tokens: 1200 })
-    });
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
-    const j1 = raw.indexOf('['), j2 = raw.lastIndexOf(']');
-    if(j1 === -1 || j2 === -1) throw new Error('Invalid response');
-    questions = JSON.parse(raw.substring(j1, j2+1));
-    if(!questions.length) throw new Error('No questions');
-    renderQuestion();
-  } catch(e) {
-    document.getElementById('quiz-wrap').innerHTML = `
-      <div style="text-align:center;padding:32px;">
-        <div style="font-size:32px;">😅</div>
-        <div style="font-size:14px;margin-top:10px;font-weight:600;">Gagal load soal, coba lagi!</div>
-        <button class="btn-next" onclick="restartQuiz()" style="margin-top:16px;">🔄 Coba Lagi</button>
-      </div>`;
-  }
+  const res = await fetch('/api/recommend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: [{ role: 'user', content: prompt }], max_tokens: 400 })
+  });
+  const data = await res.json();
+  const raw = data.content?.[0]?.text || '';
+  const j1 = raw.indexOf('{'), j2 = raw.lastIndexOf('}');
+  if (j1 === -1 || j2 === -1) throw new Error('Invalid JSON');
+  return JSON.parse(raw.substring(j1, j2 + 1));
 }
 
-function renderQuestion() {
-  if(currentQ >= questions.length) {
-    showEndScreen();
-    return;
-  }
+// ── PREFETCH soal berikutnya di background ──
+function prefetchNext() {
+  if (prefetchPromise) return; // sudah ada yang jalan
+  prefetchPromise = fetchOneQuestion()
+    .then(q => {
+      questionQueue.push(q);
+      prefetchPromise = null;
+      // Update tombol next kalau lagi nunggu
+      const btn = document.getElementById('btn-next-action');
+      if (btn && btn.classList.contains('loading-next')) {
+        btn.classList.remove('loading-next');
+        btn.disabled = false;
+      }
+    })
+    .catch(() => {
+      prefetchPromise = null;
+    });
+}
 
+// ── AMBIL SOAL DARI QUEUE atau fetch baru ──
+async function getNextQuestion() {
+  if (questionQueue.length > 0) {
+    return questionQueue.shift();
+  }
+  // Kalau queue kosong, tunggu prefetch yang jalan
+  if (prefetchPromise) {
+    await prefetchPromise;
+    if (questionQueue.length > 0) return questionQueue.shift();
+  }
+  // Fallback: fetch langsung
+  return await fetchOneQuestion();
+}
+
+// ── RENDER SOAL ──
+function renderQuestion(q) {
   attemptsLeft = 2;
   answered = false;
-  const q = questions[currentQ];
   updateScore();
 
   const letters = ['A','B','C','D'];
@@ -271,90 +270,130 @@ function renderQuestion() {
       <div class="q-text">${q.question}</div>
       <div class="q-attempts" id="attempts-badge">${attemptsLeft} kesempatan</div>
     </div>
-    <div class="choices" id="choices">${choicesHTML}</div>
+    <div class="choices" id="choices" data-q='${JSON.stringify(q).replace(/'/g,"&#39;")}'>${choicesHTML}</div>
     <div id="response-wrap"></div>
     <div id="btn-next-wrap"></div>`;
 }
 
+// ── INIT ──
+async function initQuiz() {
+  currentQ = 0; scoreCorrect = 0; scoreWrong = 0;
+  questionQueue = []; prefetchPromise = null;
+
+  document.getElementById('quiz-wrap').innerHTML = `
+    <div class="loading">
+      <div class="load-dots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div class="load-txt">Nyiapin soal random...</div>
+    </div>`;
+
+  try {
+    const q = await fetchOneQuestion();
+    renderQuestion(q);
+    // Langsung prefetch soal ke-2 di background
+    prefetchNext();
+  } catch(e) {
+    document.getElementById('quiz-wrap').innerHTML = `
+      <div style="text-align:center;padding:32px;">
+        <div style="font-size:32px;">😅</div>
+        <div style="font-size:14px;margin-top:10px;font-weight:600;">Gagal load soal, coba lagi!</div>
+        <button class="btn-next" onclick="initQuiz()" style="margin-top:16px;">🔄 Coba Lagi</button>
+      </div>`;
+  }
+}
+
 function selectAnswer(letter, btn) {
-  if(answered) return;
-  const q = questions[currentQ];
-  const correctLetter = q.answer.charAt(0).toUpperCase();
+  if (answered) return;
+  const correctLetter = btn.closest('.choices').dataset.answer ||
+    // ambil dari q yang disimpan di DOM
+    document.getElementById('quiz-wrap').dataset.answer;
+
+  // Ambil answer dari data attr di choices wrap
+  const q = JSON.parse(document.getElementById('choices').dataset.q || '{}');
+  const correct = (q.answer || '').charAt(0).toUpperCase();
   const allBtns = document.querySelectorAll('.choice-btn');
 
-  if(letter === correctLetter) {
-    // BENAR
+  if (letter === correct) {
     answered = true;
     scoreCorrect++;
     btn.classList.add('correct');
     allBtns.forEach(b => { b.disabled = true; if(b !== btn) b.classList.add('disabled-gray'); });
-
     document.getElementById('response-wrap').innerHTML = `
       <div class="response correct-msg">✅ ${getRandom(correctResponses)}</div>`;
-
-    document.getElementById('btn-next-wrap').innerHTML = `
-      <button class="btn-next" onclick="nextQuestion()">
-        ${currentQ + 1 >= TOTAL_Q ? '🏁 Lihat Hasil' : 'Soal Berikutnya →'}
-      </button>`;
-
+    showNextButton(q);
     updateScore();
-
   } else {
-    // SALAH
     attemptsLeft--;
     btn.classList.add('wrong');
     btn.disabled = true;
     setTimeout(() => btn.classList.remove('wrong'), 400);
-
     document.getElementById('attempts-badge').textContent = `${attemptsLeft} kesempatan`;
 
-    if(attemptsLeft > 0) {
-      // Masih ada kesempatan
+    if (attemptsLeft > 0) {
       document.getElementById('response-wrap').innerHTML = `
         <div class="response wrong-msg">❌ ${getRandom(wrongResponses)}</div>`;
     } else {
-      // Habis kesempatan
       answered = true;
       scoreWrong++;
       allBtns.forEach(b => { b.disabled = true; if(!b.classList.contains('wrong')) b.classList.add('disabled-gray'); });
-
-      // Highlight jawaban benar
-      allBtns.forEach(b => {
-        if(b.dataset.letter === correctLetter) b.classList.add('correct');
-      });
-
+      allBtns.forEach(b => { if(b.dataset.letter === correct) b.classList.add('correct'); });
       document.getElementById('response-wrap').innerHTML = `
         <div class="response wrong-msg">❌ ${getRandom(finalWrongResponses)}</div>
-        <div class="response answer-msg" style="margin-top:8px;">💡 Jawaban benar: <strong>${correctLetter}</strong>. ${q.explanation}</div>`;
-
-      document.getElementById('btn-next-wrap').innerHTML = `
-        <button class="btn-next" onclick="nextQuestion()">
-          ${currentQ + 1 >= TOTAL_Q ? '🏁 Lihat Hasil' : 'Soal Berikutnya →'}
-        </button>`;
-
+        <div class="response answer-msg" style="margin-top:8px;">💡 Jawaban benar: <strong>${correct}</strong>. ${q.explanation}</div>`;
+      showNextButton(q);
       updateScore();
     }
   }
 }
 
-function nextQuestion() {
+function showNextButton(q) {
+  const isLast = currentQ + 1 >= TOTAL_Q;
+  // Cek apakah prefetch sudah selesai
+  const nextReady = questionQueue.length > 0;
+  const loadingClass = (!isLast && !nextReady) ? 'loading-next' : '';
+  const disabledAttr = (!isLast && !nextReady) ? '' : ''; // tidak disable, hanya visual
+
+  document.getElementById('btn-next-wrap').innerHTML = `
+    <button class="btn-next ${loadingClass}" id="btn-next-action" onclick="nextQuestion()">
+      ${isLast ? '🏁 Lihat Hasil' : 'Soal Berikutnya →'}
+    </button>`;
+}
+
+async function nextQuestion() {
   currentQ++;
-  if(currentQ >= TOTAL_Q) {
+  if (currentQ >= TOTAL_Q) {
     showEndScreen();
-  } else {
-    renderQuestion();
+    return;
+  }
+
+  // Tampilkan loading mini kalau soal belum siap
+  const btn = document.getElementById('btn-next-action');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Nyiapin soal...'; }
+
+  try {
+    const q = await getNextQuestion();
+    renderQuestion(q);
+    // Prefetch soal berikutnya
+    if (currentQ + 1 < TOTAL_Q) prefetchNext();
+  } catch(e) {
+    document.getElementById('quiz-wrap').innerHTML = `
+      <div style="text-align:center;padding:32px;">
+        <div style="font-size:32px;">😅</div>
+        <div style="font-size:14px;margin-top:10px;font-weight:600;">Gagal load soal, coba lagi!</div>
+        <button class="btn-next" onclick="initQuiz()" style="margin-top:16px;">🔄 Mulai Ulang</button>
+      </div>`;
   }
 }
 
 function showEndScreen() {
   const pct = Math.round((scoreCorrect / TOTAL_Q) * 100);
   let emoji, title, sub;
-
-  if(pct === 100) { emoji='🏆'; title='Perfect!'; sub='Kamu tau segalanya. Serius deh.'; }
-  else if(pct >= 80) { emoji='🎉'; title='Keren!'; sub='Hampir sempurna. Satu lagi bisa full!'; }
-  else if(pct >= 60) { emoji='😎'; title='Lumayan!'; sub='Di atas rata-rata. Boleh lah.'; }
-  else if(pct >= 40) { emoji='😅'; title='Ya gitu deh'; sub='Setengahnya bener. Setengahnya... ya tau lah.'; }
-  else { emoji='💀'; title='Aduh'; sub='Mungkin kurang baca-baca nih. Coba lagi?'; }
+  if(pct === 100){ emoji='🏆'; title='Perfect!'; sub='Kamu tau segalanya. Serius deh.'; }
+  else if(pct >= 80){ emoji='🎉'; title='Keren!'; sub='Hampir sempurna. Satu lagi bisa full!'; }
+  else if(pct >= 60){ emoji='😎'; title='Lumayan!'; sub='Di atas rata-rata. Boleh lah.'; }
+  else if(pct >= 40){ emoji='😅'; title='Ya gitu deh'; sub='Setengahnya bener. Setengahnya... ya tau lah.'; }
+  else{ emoji='💀'; title='Aduh'; sub='Mungkin kurang baca-baca nih. Coba lagi?'; }
 
   document.getElementById('quiz-wrap').innerHTML = `
     <div class="end-card">
@@ -363,8 +402,8 @@ function showEndScreen() {
       <div class="end-sub">${sub}</div>
       <div class="end-score">${scoreCorrect}/${TOTAL_Q}</div>
       <div class="end-total">Benar dari ${TOTAL_Q} soal (${pct}%)</div>
-      <button class="btn-restart" onclick="restartQuiz()">🔄 Quiz Lagi!</button>
-      <button class="btn-share" onclick="shareResult(${scoreCorrect}, ${TOTAL_Q})">💬 Share ke WA</button>
+      <button class="btn-restart" onclick="initQuiz()">🔄 Quiz Lagi!</button>
+      <button class="btn-share" onclick="shareResult(${scoreCorrect},${TOTAL_Q})">💬 Share ke WA</button>
     </div>`;
 }
 
@@ -374,24 +413,8 @@ function shareResult(correct, total) {
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
-function restartQuiz() {
-  currentQ = 0;
-  scoreCorrect = 0;
-  scoreWrong = 0;
-  questions = [];
-  updateScore();
-  document.getElementById('quiz-wrap').innerHTML = `
-    <div class="loading">
-      <div class="load-dots">
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-      </div>
-      <div class="load-txt">Nyiapin soal random...</div>
-    </div>`;
-  loadQuestions();
-}
-
-// Init
-loadQuestions();
+// ── START ──
+initQuiz();
 </script>
 </body>
 </html>
