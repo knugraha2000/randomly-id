@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     const claudeKey = process.env.ANTHROPIC_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
 
-    let selectedEngine = engine || 'claude';
+    let selectedEngine = engine || 'gemini';
 
     // Auto random kalau ada kedua key
     if (selectedEngine === 'random') {
