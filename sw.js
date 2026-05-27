@@ -1,14 +1,12 @@
-const CACHE_NAME = 'randomly-v2';
+const CACHE_NAME = 'randomly-v3';
 const ASSETS = [
   '/',
   '/index.html',
   '/content.js',
-  '/logo-splash.png',
   '/icon-192.png',
   '/icon-512.png'
 ];
 
-// Install — cache assets
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
@@ -16,7 +14,6 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// Activate — clean old cache
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -26,9 +23,7 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch — network first, fallback to cache
 self.addEventListener('fetch', e => {
-  // Skip API calls — always fresh
   if(e.request.url.includes('/api/')) return;
 
   e.respondWith(
