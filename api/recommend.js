@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     const claudeKey = process.env.ANTHROPIC_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
 
-    let selectedEngine = engine || 'claude';
+    let selectedEngine = engine || 'gemini';
 
     // Auto random kalau ada kedua key
     if (selectedEngine === 'random') {
