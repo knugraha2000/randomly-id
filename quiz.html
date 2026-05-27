@@ -145,6 +145,7 @@ let attemptsLeft = 2;
 let scoreCorrect = 0;
 let scoreWrong = 0;
 let answered = false;
+let currentQuestion = {};
 
 // Queue: soal yang sudah di-fetch, siap tampil
 let questionQueue = [];
@@ -257,6 +258,7 @@ async function getNextQuestion() {
 function renderQuestion(q) {
   attemptsLeft = 2;
   answered = false;
+  currentQuestion = q;
   updateScore();
 
   const letters = ['A','B','C','D'];
@@ -272,7 +274,7 @@ function renderQuestion(q) {
       <div class="q-text">${q.question}</div>
       <div class="q-attempts" id="attempts-badge">${attemptsLeft} kesempatan</div>
     </div>
-    <div class="choices" id="choices" data-q='${JSON.stringify(q).replace(/'/g,"&#39;")}'>${choicesHTML}</div>
+    <div class="choices" id="choices" >${choicesHTML}</div>
     <div id="response-wrap"></div>
     <div id="btn-next-wrap"></div>`;
 }
@@ -312,7 +314,7 @@ function selectAnswer(letter, btn) {
     document.getElementById('quiz-wrap').dataset.answer;
 
   // Ambil answer dari data attr di choices wrap
-  const q = JSON.parse(document.getElementById('choices').dataset.q || '{}');
+  const q = currentQuestion;
   const correct = (q.answer || '').charAt(0).toUpperCase();
   const allBtns = document.querySelectorAll('.choice-btn');
 
