@@ -617,7 +617,6 @@ body {
   <!-- ACTIONS -->
   <div class="action-wrap">
     <button class="btn-go" onclick="submit(false)" id="btn-rekomendasi"></button>
-    <button class="btn-random" onclick="submit(true)" id="btn-gabut"></button>
   </div>
   <div style="text-align:center;padding:8px 24px 24px;">
     <a href="/privacy.html" style="font-size:11px;color:#9A9A9A;text-decoration:none;font-weight:500;">Privacy Policy</a>
@@ -1497,8 +1496,6 @@ function initContent() {
   // Buttons
   const br = document.getElementById('btn-rekomendasi');
   if(br) br.textContent = CONTENT.btn_rekomendasi;
-  const bg = document.getElementById('btn-gabut');
-  if(bg) bg.textContent = CONTENT.btn_gabut;
   // btn-funfact label hardcoded di HTML
   // Cat labels object — override from CONTENT
   Object.assign(catLabels, CONTENT.cat_labels);
