@@ -80,7 +80,11 @@ export default async function handler(req, res) {
       if (!geminiRes.ok) return res.status(geminiRes.status).json({ error: geminiData });
 
       // Normalize ke format Claude supaya frontend tidak perlu ubah
-      const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      let text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      // Strip markdown backticks yang sering ditambah Gemini
+      text = text.replace(/```json
+?/gi, '').replace(/```
+?/gi, '').trim();
       return res.status(200).json({
         content: [{ type: 'text', text }],
         engine_used: 'gemini'
