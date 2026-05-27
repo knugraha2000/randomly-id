@@ -447,7 +447,17 @@ function showEndScreen() {
 
 function shareResult(correct, total) {
   const pct = Math.round((correct/total)*100);
-  const text = `Quiz Random di randomly.id\n\nGue dapet ${correct}/${total} bener (${pct}%)!\n\nCoba kamu bisa lebih tinggi ga?\nrandomly.id/quiz.html`;
+  const pool = {
+    100: ['Otakku ilegal rupanya. 5/5 perfect!', 'Perfect score! Bahkan Google kadang salah, aku enggak.', '5/5 bener. Serem sendiri jujur.'],
+    80:  ['4/5 bener. Hampir sempurna — sayang banget yang satu itu.', '4/5! Kurang dikit doang buat jadi jenius.', 'Dapet 4/5. Satu soal itu emang jebakan.'],
+    60:  ['3/5 bener. Lumayan — di atas rata-rata lah.', '3/5! Setengah pinter, setengah hoki. Kombinasi bagus.', 'Dapet 3/5. Medioker tapi confident.'],
+    40:  ['2/5 bener. Bebek nyebrang jalan juga bisa dapet segini.', '2/5... tidak istimewa, tapi konsisten kayak kentang.', 'Dapet 2/5. Setengahnya murni tebak-tebakan.'],
+    0:   ['0-1/5 bener. Pisang punya 60% DNA sama manusia — aku kayaknya pakai yang 40% sisanya.', 'Dapet 1/5. Ini prestasi. Susah lho dapet sesalah ini.', '0/5. Batu juga bisa dapet nilai segini kalau dilempar ke layar.']
+  };
+  const bucket = pct === 100 ? 100 : pct >= 80 ? 80 : pct >= 60 ? 60 : pct >= 40 ? 40 : 0;
+  const desc = pool[bucket][Math.floor(Math.random() * pool[bucket].length)];
+  const challenge = correct < total ? '\nKamu bisa lebih tinggi ga? 👀' : '\nBerani coba ngalahin ini? 😈';
+  const text = `Quiz Random di randomly.id\n\n${desc}\n${challenge}\nrandomly.id`;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
