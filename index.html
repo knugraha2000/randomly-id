@@ -1415,23 +1415,18 @@ async function getFunFact() {
   const domains = ['sejarah manusia','teknologi & sains','negara & geografi','bahasa & budaya','makanan & kuliner','musik & seni','olahraga & rekor','tubuh manusia','luar angkasa','ekonomi & uang','hukum & politik','arkeologi','psikologi','matematika','transportasi'];
   const domain = domains[Math.floor(Math.random() * domains.length)];
 
-  const prompt = `Berikan 1 fakta mengejutkan dari domain: ${domain}.${histNote}
-
-Tulis field "alasan" seperti ini — 1 kalimat pendek, ngobrol, kayak nulis caption atau tweet:
-
-CONTOH YANG BENAR:
-"kamu udah buang 6 bulan hidup cuma buat nunggu loading doang"
-"otak manusia sebenernya ga bisa multitasking, yang ada cuma pura-pura bisa"
-"rapat 1 jam yang bisa jadi email itu udah makan 1/3 konsentrasi harian kamu"
-"uang kertas yang kamu pegang sekarang udah disentuh ribuan orang yang ga cuci tangan"
-
-CONTOH YANG SALAH (jangan seperti ini):
-"Penelitian menunjukkan bahwa rata-rata manusia menghabiskan waktu yang signifikan..."
-"Fakta menarik ini membuktikan bahwa kehidupan modern memiliki dampak..."
-
-Aturan: jangan pakai emoji, jangan formal, jangan motivasi, boleh existential, 1 kalimat saja, Bahasa Indonesia casual.
-Seed: ${seed}. Balas HANYA JSON tanpa backtick:
-{"emoji":"(1 emoji)","nama":"(judul fakta dalam huruf kapital semua, harus kalimat lengkap dan bermakna, tidak boleh disingkat, tidak boleh menggantung)","alasan":"(penjelasan 3 kalimat, ada angka/data konkret, mengejutkan)","fun_fact":"","tags":["${domain}","fakta","unik"]}`;
+  const ffPromptLines = [
+    'Berikan 1 fakta mengejutkan dari domain: ' + domain + '.' + histNote,
+    '',
+    'Tulis field "alasan": 1 kalimat pendek, ngobrol, kayak caption atau tweet.',
+    'Contoh benar: "kamu udah buang 6 bulan hidup cuma buat nunggu loading doang"',
+    'Contoh benar: "otak manusia sebenernya ga bisa multitasking, yang ada cuma pura-pura bisa"',
+    'Contoh salah: "Penelitian menunjukkan bahwa rata-rata manusia menghabiskan..."',
+    'Aturan: jangan pakai emoji, jangan formal, 1 kalimat, Bahasa Indonesia casual.',
+    'Seed: ' + seed + '. Balas HANYA JSON tanpa backtick:',
+    '{"emoji":"(1 emoji)","nama":"(judul fakta KAPITAL, lengkap, tidak menggantung)","alasan":"(1 kalimat casual)","fun_fact":"","tags":["' + domain + '","fakta","unik"]}'
+  ];
+  const prompt = ffPromptLines.join('\n');
 
   try {
     const res = await fetch('/api/recommend', {
