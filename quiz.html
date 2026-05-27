@@ -196,17 +196,33 @@ async function loadQuestions() {
   const topics = ['sejarah dunia','sains & alam','teknologi','budaya & seni','geografi','tubuh manusia','makanan','olahraga','bahasa','ekonomi'];
   const topic = topics[Math.floor(Math.random() * topics.length)];
 
-  const prompt = `Buat ${TOTAL_Q} soal kuis pilihan ganda dalam Bahasa Indonesia yang natural dan casual. Topik: ${topic}. Seed: ${seed}.
+  const prompt = `Buat ${TOTAL_Q} soal kuis pilihan ganda yang aneh, counterintuitive, dan bikin orang mikir keras. Topik: ${topic}. Seed: ${seed}.
 
-Setiap soal harus:
-- Pertanyaan singkat dan menarik
-- 4 pilihan jawaban (A, B, C, D)
-- 1 jawaban benar
-- Tingkat kesulitan bervariasi (ada yang gampang, ada yang bikin mikir)
-- Faktual dan akurat
+FILOSOFI SOAL: Soal yang bagus adalah soal yang jawabannya bikin orang bilang "hah, beneran?" setelah tau jawabannya. Bukan soal hafalan.
+
+CONTOH SOAL YANG BAGUS:
+Q: "Berapa lama waktu yang dibutuhkan untuk sinar matahari sampai ke bumi?"
+A. 2 menit  B. 8 menit  C. 30 menit  D. 2 jam
+(semua terasa masuk akal, tapi jarang yang tau persis)
+
+Q: "Negara mana yang punya garis pantai terpanjang di dunia?"
+A. Australia  B. Rusia  C. Kanada  D. Indonesia
+(orang kira Australia atau Rusia, padahal Kanada)
+
+Q: "Berapa % tubuh manusia yang terdiri dari air?"
+A. 45%  B. 60%  C. 78%  D. 90%
+
+ATURAN WAJIB:
+1. Semua pilihan harus sama-sama terasa masuk akal — tidak ada yang jelas-jelas salah
+2. Jawaban benar harus counterintuitive atau mengejutkan
+3. Pertanyaan boleh aneh, absurd, atau unexpected
+4. Hindari soal sejarah hafalan yang predictable
+5. Pilih topik yang jarang dibahas — bukan fakta umum
+6. Semua pilihan harus tipe data yang sama (semua angka / semua negara / semua nama)
+7. Bahasa Indonesia casual, bukan formal
 
 Balas HANYA JSON array tanpa backtick:
-[{"question":"pertanyaan","choices":["A. ..","B. ..","C. ..","D. .."],"answer":"A","explanation":"penjelasan singkat kenapa jawabannya itu, casual dan sedikit lucu"}]`;
+[{"question":"pertanyaan","choices":["A. ..","B. ..","C. ..","D. .."],"answer":"A","explanation":"penjelasan singkat kenapa jawabannya itu, casual dan sedikit lucu — boleh ada unsur 'hah ternyata'"}]`;
 
   try {
     const res = await fetch('/api/recommend', {
