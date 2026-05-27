@@ -224,6 +224,7 @@ Balas HANYA JSON object tanpa backtick:
 // ── PREFETCH soal berikutnya di background ──
 function prefetchNext() {
   if (prefetchPromise) return; // sudah ada yang jalan
+  if (questionQueue.length >= 2) return; // queue sudah cukup
   prefetchPromise = fetchOneQuestion()
     .then(q => {
       questionQueue.push(q);
@@ -234,6 +235,8 @@ function prefetchNext() {
         btn.classList.remove('loading-next');
         btn.disabled = false;
       }
+      // Prefetch lagi kalau masih butuh
+      const totalFetched = (window._qFetched || 0) + questionQueue.length;
     })
     .catch(() => {
       prefetchPromise = null;
@@ -282,7 +285,8 @@ function renderQuestion(q) {
 // ── INIT ──
 async function initQuiz() {
   currentQ = 0; scoreCorrect = 0; scoreWrong = 0;
-  questionQueue = []; prefetchPromise = null;
+  // Kalau restart (bukan pertama kali), clear queue biar soal segar
+  if (scoreCorrect > 0 || scoreWrong > 0) { questionQueue = []; prefetchPromise = null; }
 
   document.getElementById('quiz-wrap').innerHTML = `
     <div class="loading">
@@ -293,10 +297,10 @@ async function initQuiz() {
     </div>`;
 
   try {
-    const q = await fetchOneQuestion();
+    const q = await getNextQuestion(); // pakai queue kalau sudah siap
     renderQuestion(q);
     // Langsung prefetch soal ke-2 di background
-    prefetchNext();
+    if (currentQ + 1 < TOTAL_Q) prefetchNext();
   } catch(e) {
     document.getElementById('quiz-wrap').innerHTML = `
       <div style="text-align:center;padding:32px;">
@@ -393,7 +397,6 @@ async function nextQuestion() {
 
 function showEndScreen() {
   const pct = Math.round((scoreCorrect / TOTAL_Q) * 100);
-  let emoji, title, sub;
 
   const perfect = [
     { e:'🧠', t:'Otakmu Ilegal', s:'Kamu harusnya ditangkap karena terlalu pinter. Ini bukan pujian, ini ancaman.' },
@@ -429,7 +432,7 @@ function showEndScreen() {
   else pool = bad;
 
   const pick = pool[Math.floor(Math.random() * pool.length)];
-  const emoji = pick.e, title = pick.t, sub = pick.s;
+  const { e: emoji, t: title, s: sub } = pick;
 
   document.getElementById('quiz-wrap').innerHTML = `
     <div class="end-card">
@@ -450,6 +453,8 @@ function shareResult(correct, total) {
 }
 
 // ── START ──
+// Mulai fetch soal pertama SEKARANG (paralel dengan render halaman)
+prefetchNext();
 initQuiz();
 </script>
 </body>
