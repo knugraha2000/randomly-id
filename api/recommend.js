@@ -29,7 +29,6 @@ module.exports = async function handler(req, res) {
     }
 
     // ── ENGINE SELECTION ──
-    // 'claude' | 'gemini' | 'random'
     const claudeKey = process.env.ANTHROPIC_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
 
@@ -45,66 +44,79 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Fallback
     if (selectedEngine === 'gemini' && !geminiKey) selectedEngine = 'claude';
     if (selectedEngine === 'claude' && !claudeKey) selectedEngine = 'gemini';
 
     const prompt = messages?.[messages.length - 1]?.content || '';
 
     // ── GEMINI ──
-    if (selectedEngine === 'gemini') {
-      const geminiModel = 'gemini-2.0-flash';
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`;
-
-      const geminiBody = {
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          maxOutputTokens: max_tokens || 600,
-          temperature: 0.9,
-        },
-        systemInstruction: {
-          parts: [{ text: 'You are a helpful assistant. Always respond with valid JSON only. No markdown, no backticks, no explanation. Just raw JSON.' }]
-        }
-      };
-
+    async function callGemini() {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`;
       const geminiRes = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(geminiBody)
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: max_tokens || 600, temperature: 0.9 },
+          systemInstruction: {
+            parts: [{ text: 'You are a helpful assistant. Always respond with valid JSON only. No markdown, no backticks, no explanation. Just raw JSON.' }]
+          }
+        })
       });
-
       const geminiData = await geminiRes.json();
-      if (!geminiRes.ok) return res.status(geminiRes.status).json({ error: geminiData });
-
+      if (!geminiRes.ok) throw { status: geminiRes.status, data: geminiData };
       let text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
       text = text.replace(/```json\n?/gi, '').replace(/```\n?/gi, '').trim();
-
-      return res.status(200).json({
-        content: [{ type: 'text', text }],
-        engine_used: 'gemini'
-      });
+      return { content: [{ type: 'text', text }], engine_used: 'gemini' };
     }
 
     // ── CLAUDE ──
-    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': claudeKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: max_tokens || 600,
-        system: 'You are a helpful assistant. Always respond with valid JSON only. No markdown, no backticks, no explanation. Just raw JSON.',
-        messages: messages
-      })
-    });
+    async function callClaude() {
+      const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': claudeKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: max_tokens || 600,
+          system: 'You are a helpful assistant. Always respond with valid JSON only. No markdown, no backticks, no explanation. Just raw JSON.',
+          messages: messages
+        })
+      });
+      const claudeData = await claudeRes.json();
+      if (!claudeRes.ok) throw { status: claudeRes.status, data: claudeData };
+      return { ...claudeData, engine_used: 'claude' };
+    }
 
-    const claudeData = await claudeRes.json();
-    if (!claudeRes.ok) return res.status(claudeRes.status).json({ error: claudeData });
-
-    return res.status(200).json({ ...claudeData, engine_used: 'claude' });
+    // ── CALL WITH AUTO-FALLBACK ──
+    try {
+      if (selectedEngine === 'gemini') {
+        const result = await callGemini();
+        return res.status(200).json(result);
+      } else {
+        const result = await callClaude();
+        return res.status(200).json(result);
+      }
+    } catch (primaryErr) {
+      // Auto-fallback: kalau Gemini 429/500, coba Claude — dan sebaliknya
+      console.error('Primary engine failed:', primaryErr?.status, JSON.stringify(primaryErr?.data));
+      try {
+        if (selectedEngine === 'gemini' && claudeKey) {
+          const result = await callClaude();
+          return res.status(200).json(result);
+        } else if (selectedEngine === 'claude' && geminiKey) {
+          const result = await callGemini();
+          return res.status(200).json(result);
+        }
+        throw primaryErr;
+      } catch (fallbackErr) {
+        console.error('Fallback engine also failed:', fallbackErr?.status);
+        return res.status(primaryErr?.status || 500).json({ error: primaryErr?.data || 'Both engines failed' });
+      }
+    }
 
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error', detail: error.message });
