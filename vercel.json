@@ -8,6 +8,7 @@
     { "source": "/sitemap.xml", "destination": "/api/sitemap" }
   ],
   "crons": [
-    { "path": "/api/cron/generate-seo-pages", "schedule": "0 20 * * *" }
+    { "path": "/api/cron/generate-seo-pages", "schedule": "0 20 * * *" },
+    { "path": "/api/cron/generate-social-post", "schedule": "30 20 * * *" }
   ]
 }
