@@ -26,6 +26,9 @@ module.exports = async function handler(req, res) {
     return res.status(200).send(png);
   } catch (err) {
     console.error('[social/:id/image] error:', err);
-    return res.status(500).send('Internal server error');
+    // Sementara tampilkan detail error di response (bukan cuma "Internal
+    // server error" generik) biar gampang didiagnosis dari browser tanpa
+    // perlu buka Vercel logs. Aman dihapus lagi setelah stabil.
+    return res.status(500).send(`Internal server error: ${err.message}`);
   }
 };
