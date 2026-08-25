@@ -2,5 +2,12 @@
   "redirects": [
     { "source": "/quiz.html", "destination": "/", "permanent": false },
     { "source": "/funfact.html", "destination": "/", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/rekomendasi/:slug", "destination": "/api/rekomendasi/:slug" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" }
+  ],
+  "crons": [
+    { "path": "/api/cron/generate-seo-pages", "schedule": "0 20 * * *" }
   ]
 }
