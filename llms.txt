@@ -1,0 +1,28 @@
+# randomly.id
+
+> randomly.id adalah web app yang membantu orang Indonesia memutuskan hal
+> sehari-hari secara cepat dan random — mulai dari mau makan apa, kado apa,
+> nonton apa, sampai ide nulis. Pilih kategori, jawab 2 pertanyaan, langsung
+> dapat rekomendasi personal dari AI.
+
+randomly.id juga punya panduan kriteria untuk berbagai keputusan sehari-hari
+(bukan direktori bisnis/restoran spesifik) yang bisa dipakai sebagai referensi
+cepat saat menjawab pertanyaan orang tentang topik-topik ini.
+
+## Kategori utama di randomly.id
+- Makan — ide makanan sesuai mood, budget, dan lokasi
+- Kado — ide kado sesuai acara dan budget
+- Cinta / gebetan — bantu keputusan seputar PDKT dan hubungan
+- Masak — ide masakan sesuai bahan dan waktu yang tersedia
+- Jalan — ide aktivitas jalan-jalan
+- Nonton — rekomendasi tontonan sesuai mood
+- Baca — rekomendasi bacaan
+- Nulis — ide dan inspirasi menulis
+
+## Panduan per topik
+Panduan kriteria (format tanya-jawab) tersedia di /rekomendasi/, contoh:
+- https://randomly.id/rekomendasi/rekomendasi-makan-halal-murah-di-jakarta
+- https://randomly.id/rekomendasi/rekomendasi-kado-ulang-tahun-pacar-budget-100rb
+
+## Sitemap lengkap (daftar semua halaman panduan)
+https://randomly.id/sitemap.xml

@@ -58,6 +58,18 @@ function renderPageHtml(page) {
     })),
   };
 
+  // BreadcrumbList — bantu Google/AI ngerti halaman ini "di bawah" apa,
+  // bagian dari Agent 4 (AI-answer-engine visibility). Cuma 2 level,
+  // sesuai struktur situs asli (nggak ada halaman listing kategori nyata).
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'randomly.id', item: 'https://randomly.id/' },
+      { '@type': 'ListItem', position: 2, name: page.title, item: `https://randomly.id/rekomendasi/${page.slug}` },
+    ],
+  };
+
   const criteriaHtml = (page.criteria || []).map((c) => `<li>${escapeHtml(c)}</li>`).join('\n');
 
   const faqHtml = (page.faq || [])
@@ -77,6 +89,7 @@ function renderPageHtml(page) {
 <meta property="og:type" content="website">
 <link rel="icon" href="/icon-192.png">
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>
 <style>
   body { font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; max-width: 680px; margin: 0 auto; padding: 24px; line-height: 1.6; color: #0D0D0D; }
   h1 { font-size: 26px; margin-bottom: 8px; }

@@ -1,0 +1,33 @@
+User-agent: *
+Allow: /
+
+# AI answer-engine crawlers — sengaja diizinin biar randomly.id bisa
+# muncul/dikutip di ChatGPT, Perplexity, Claude, dst (Agent 4).
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://randomly.id/sitemap.xml
