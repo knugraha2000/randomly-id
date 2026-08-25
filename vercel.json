@@ -9,8 +9,18 @@
   ],
   "crons": [
     { "path": "/api/cron/generate-seo-pages", "schedule": "0 20 * * *" },
-    { "path": "/api/cron/generate-social-post", "schedule": "30 20 * * *" },
-    { "path": "/api/cron/publish-social-post", "schedule": "35 20 * * *" }
+
+    { "path": "/api/cron/generate-social-post", "schedule": "25 0 * * *" },
+    { "path": "/api/cron/publish-social-post", "schedule": "30 0 * * *" },
+
+    { "path": "/api/cron/generate-social-post", "schedule": "25 4 * * *" },
+    { "path": "/api/cron/publish-social-post", "schedule": "30 4 * * *" },
+
+    { "path": "/api/cron/generate-social-post", "schedule": "25 10 * * *" },
+    { "path": "/api/cron/publish-social-post", "schedule": "30 10 * * *" },
+
+    { "path": "/api/cron/generate-social-post", "schedule": "25 13 * * *" },
+    { "path": "/api/cron/publish-social-post", "schedule": "30 13 * * *" }
   ],
   "functions": {
     "api/**/*.js": {
