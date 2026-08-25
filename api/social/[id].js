@@ -61,6 +61,7 @@ function renderCardHtml(post) {
 </head>
 <body>
 <div class="meta">Draft #${post.id} · ${escapeHtml(post.type)} · topik: ${escapeHtml(post.topic)} · status: ${escapeHtml(post.status)}</div>
+<img src="/api/social/${post.id}/image" alt="Kartu ${escapeHtml(post.type)}" style="width:100%;max-width:420px;border-radius:24px;border:3px solid #0D0D0D;margin-bottom:20px;">
 <div class="card">${body}</div>
 <footer>randomly.id — preview internal, belum di-posting otomatis</footer>
 </body>
