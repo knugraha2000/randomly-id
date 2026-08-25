@@ -13,7 +13,7 @@
   ],
   "functions": {
     "api/**/*.js": {
-      "includeFiles": "assets/**"
+      "includeFiles": "**/*.{ttf,wasm}"
     }
   }
 }
