@@ -13,9 +13,18 @@
 const { getSupabase } = require('../../lib/supabaseClient');
 const { generateCandidates } = require('../../lib/combos');
 
-// Mulai kecil: 5 halaman baru/hari. Naikin pelan-pelan setelah lihat
-// beberapa batch pertama ke-index dengan baik di Search Console.
-const BATCH_SIZE = 5;
+// Plan Hobby Vercel cuma kasih waktu MAKSIMAL 10 DETIK per function call.
+// Generate halaman satu-satu berurutan gampang lewat batas itu (tiap
+// panggilan Claude API bisa 2-5 detik). Makanya di bawah kita generate
+// SEMUA halaman dalam satu batch secara PARALEL (Promise.all), bukan
+// antre — total waktu jadi ~waktu 1 request paling lambat, bukan jumlah
+// semuanya. Batch size juga sengaja dikecilin dulu buat jaga-jaga.
+const BATCH_SIZE = 3;
+
+// Kalau kamu upgrade ke plan Pro nanti, function bisa jalan sampai 60 detik
+// (bahkan 300 detik kalau di-set eksplisit) — baru worth naikin BATCH_SIZE
+// dan/atau balik ke pola berurutan kalau perlu urutan tertentu.
+module.exports.config = { maxDuration: 10 };
 
 module.exports = async function handler(req, res) {
   // Vercel Cron otomatis kirim header Authorization: Bearer <CRON_SECRET>.
@@ -42,29 +51,31 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ message: 'Semua kombinasi yang ada sudah ter-generate.', generated: 0 });
     }
 
-    const results = [];
-    for (const combo of toGenerate) {
-      try {
-        const page = await generatePageContent(combo);
-        const { error: insertErr } = await supabase.from('seo_pages').insert({
-          slug: combo.slug,
-          category: combo.category,
-          location: combo.location,
-          modifier: combo.modifier,
-          title: page.title,
-          meta_description: page.meta_description,
-          intro: page.intro,
-          criteria: page.criteria,
-          faq: page.faq,
-          status: 'published',
-        });
-        if (insertErr) throw insertErr;
-        results.push({ slug: combo.slug, status: 'ok' });
-      } catch (err) {
-        console.error(`[generate-seo-pages] gagal generate ${combo.slug}:`, err.message);
-        results.push({ slug: combo.slug, status: 'error', message: err.message });
-      }
-    }
+    // Generate + insert semua combo secara paralel, bukan satu-satu.
+    const results = await Promise.all(
+      toGenerate.map(async (combo) => {
+        try {
+          const page = await generatePageContent(combo);
+          const { error: insertErr } = await supabase.from('seo_pages').insert({
+            slug: combo.slug,
+            category: combo.category,
+            location: combo.location,
+            modifier: combo.modifier,
+            title: page.title,
+            meta_description: page.meta_description,
+            intro: page.intro,
+            criteria: page.criteria,
+            faq: page.faq,
+            status: 'published',
+          });
+          if (insertErr) throw insertErr;
+          return { slug: combo.slug, status: 'ok' };
+        } catch (err) {
+          console.error(`[generate-seo-pages] gagal generate ${combo.slug}:`, err.message);
+          return { slug: combo.slug, status: 'error', message: err.message };
+        }
+      })
+    );
 
     return res.status(200).json({
       generated: results.filter((r) => r.status === 'ok').length,
